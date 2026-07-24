@@ -59,6 +59,20 @@ namespace _3DVision
             this.lblSrIp = new System.Windows.Forms.Label();
             this.cmbSensors = new System.Windows.Forms.ComboBox();
             this.btnDiscover = new System.Windows.Forms.Button();
+            this.grpGrab = new System.Windows.Forms.GroupBox();
+            this.btnGrab = new System.Windows.Forms.Button();
+            this.txtProfileCount = new System.Windows.Forms.TextBox();
+            this.lblProfileCount = new System.Windows.Forms.Label();
+            this.tabPageIntegration = new System.Windows.Forms.TabPage();
+            this.grpContinuousScan = new System.Windows.Forms.GroupBox();
+            this.btnScanStop = new System.Windows.Forms.Button();
+            this.btnScanStart = new System.Windows.Forms.Button();
+            this.txtTransportRes = new System.Windows.Forms.TextBox();
+            this.lblTransportRes = new System.Windows.Forms.Label();
+            this.txtStartPos = new System.Windows.Forms.TextBox();
+            this.lblStartPos = new System.Windows.Forms.Label();
+            this.btnHome = new System.Windows.Forms.Button();
+            this.picHeightMap = new System.Windows.Forms.PictureBox();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.tabMain.SuspendLayout();
@@ -69,12 +83,17 @@ namespace _3DVision
             ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).BeginInit();
             this.tabPageSmartRay.SuspendLayout();
             this.grpSmartRay.SuspendLayout();
+            this.grpGrab.SuspendLayout();
+            this.tabPageIntegration.SuspendLayout();
+            this.grpContinuousScan.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).BeginInit();
             this.SuspendLayout();
             //
             // tabMain
             //
-            this.tabMain.Controls.Add(this.tabPageAcs);
             this.tabMain.Controls.Add(this.tabPageSmartRay);
+            this.tabMain.Controls.Add(this.tabPageAcs);
+            this.tabMain.Controls.Add(this.tabPageIntegration);
             this.tabMain.Location = new System.Drawing.Point(12, 12);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
@@ -89,7 +108,7 @@ namespace _3DVision
             this.tabPageAcs.Name = "tabPageAcs";
             this.tabPageAcs.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageAcs.Size = new System.Drawing.Size(460, 274);
-            this.tabPageAcs.TabIndex = 0;
+            this.tabPageAcs.TabIndex = 1;
             this.tabPageAcs.Text = "ACS 모터";
             this.tabPageAcs.UseVisualStyleBackColor = true;
             //
@@ -280,12 +299,13 @@ namespace _3DVision
             //
             // tabPageSmartRay
             //
+            this.tabPageSmartRay.Controls.Add(this.grpGrab);
             this.tabPageSmartRay.Controls.Add(this.grpSmartRay);
             this.tabPageSmartRay.Location = new System.Drawing.Point(4, 22);
             this.tabPageSmartRay.Name = "tabPageSmartRay";
             this.tabPageSmartRay.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageSmartRay.Size = new System.Drawing.Size(460, 274);
-            this.tabPageSmartRay.TabIndex = 1;
+            this.tabPageSmartRay.TabIndex = 0;
             this.tabPageSmartRay.Text = "SmartRay 스캐너";
             this.tabPageSmartRay.UseVisualStyleBackColor = true;
             //
@@ -390,6 +410,153 @@ namespace _3DVision
             this.btnSrInfo.UseVisualStyleBackColor = true;
             this.btnSrInfo.Click += new System.EventHandler(this.btnSrInfo_Click);
             //
+            // grpGrab
+            //
+            this.grpGrab.Controls.Add(this.btnGrab);
+            this.grpGrab.Controls.Add(this.txtProfileCount);
+            this.grpGrab.Controls.Add(this.lblProfileCount);
+            this.grpGrab.Location = new System.Drawing.Point(6, 162);
+            this.grpGrab.Name = "grpGrab";
+            this.grpGrab.Size = new System.Drawing.Size(448, 100);
+            this.grpGrab.TabIndex = 1;
+            this.grpGrab.TabStop = false;
+            this.grpGrab.Text = "2단계-B: 촬영 테스트 (실제로 레이저가 켜집니다. 주의)";
+            //
+            // lblProfileCount
+            //
+            this.lblProfileCount.AutoSize = true;
+            this.lblProfileCount.Location = new System.Drawing.Point(10, 30);
+            this.lblProfileCount.Name = "lblProfileCount";
+            this.lblProfileCount.Size = new System.Drawing.Size(65, 12);
+            this.lblProfileCount.TabIndex = 0;
+            this.lblProfileCount.Text = "프로파일 수";
+            //
+            // txtProfileCount
+            //
+            this.txtProfileCount.Location = new System.Drawing.Point(85, 27);
+            this.txtProfileCount.Name = "txtProfileCount";
+            this.txtProfileCount.Size = new System.Drawing.Size(60, 21);
+            this.txtProfileCount.TabIndex = 1;
+            this.txtProfileCount.Text = "100";
+            //
+            // btnGrab
+            //
+            this.btnGrab.BackColor = System.Drawing.Color.Goldenrod;
+            this.btnGrab.Location = new System.Drawing.Point(10, 60);
+            this.btnGrab.Name = "btnGrab";
+            this.btnGrab.Size = new System.Drawing.Size(220, 30);
+            this.btnGrab.TabIndex = 2;
+            this.btnGrab.Text = "1회 촬영 (레이저 켜짐)";
+            this.btnGrab.UseVisualStyleBackColor = false;
+            this.btnGrab.Click += new System.EventHandler(this.btnGrab_Click);
+            //
+            // tabPageIntegration
+            //
+            this.tabPageIntegration.Controls.Add(this.picHeightMap);
+            this.tabPageIntegration.Controls.Add(this.grpContinuousScan);
+            this.tabPageIntegration.Location = new System.Drawing.Point(4, 22);
+            this.tabPageIntegration.Name = "tabPageIntegration";
+            this.tabPageIntegration.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageIntegration.Size = new System.Drawing.Size(460, 274);
+            this.tabPageIntegration.TabIndex = 2;
+            this.tabPageIntegration.Text = "연동 테스트";
+            this.tabPageIntegration.UseVisualStyleBackColor = true;
+            //
+            // grpContinuousScan
+            //
+            this.grpContinuousScan.Controls.Add(this.btnScanStop);
+            this.grpContinuousScan.Controls.Add(this.btnScanStart);
+            this.grpContinuousScan.Controls.Add(this.txtTransportRes);
+            this.grpContinuousScan.Controls.Add(this.lblTransportRes);
+            this.grpContinuousScan.Controls.Add(this.txtStartPos);
+            this.grpContinuousScan.Controls.Add(this.lblStartPos);
+            this.grpContinuousScan.Controls.Add(this.btnHome);
+            this.grpContinuousScan.Location = new System.Drawing.Point(6, 6);
+            this.grpContinuousScan.Name = "grpContinuousScan";
+            this.grpContinuousScan.Size = new System.Drawing.Size(448, 140);
+            this.grpContinuousScan.TabIndex = 0;
+            this.grpContinuousScan.TabStop = false;
+            this.grpContinuousScan.Text = "3단계: 연속 스캔 (ACS가 시작~끝을 한 번에 이동, SmartRay는 외부 트리거로 자동 촬영)";
+            //
+            // lblStartPos
+            //
+            this.lblStartPos.AutoSize = true;
+            this.lblStartPos.Location = new System.Drawing.Point(10, 28);
+            this.lblStartPos.Name = "lblStartPos";
+            this.lblStartPos.Size = new System.Drawing.Size(70, 12);
+            this.lblStartPos.TabIndex = 0;
+            this.lblStartPos.Text = "시작 위치(mm)";
+            //
+            // txtStartPos
+            //
+            this.txtStartPos.Location = new System.Drawing.Point(100, 25);
+            this.txtStartPos.Name = "txtStartPos";
+            this.txtStartPos.Size = new System.Drawing.Size(80, 21);
+            this.txtStartPos.TabIndex = 1;
+            this.txtStartPos.Text = "-18.779";
+            //
+            // lblTransportRes
+            //
+            this.lblTransportRes.AutoSize = true;
+            this.lblTransportRes.Location = new System.Drawing.Point(10, 60);
+            this.lblTransportRes.Name = "lblTransportRes";
+            this.lblTransportRes.Size = new System.Drawing.Size(52, 12);
+            this.lblTransportRes.TabIndex = 4;
+            this.lblTransportRes.Text = "Transport Res(um)";
+            //
+            // txtTransportRes
+            //
+            this.txtTransportRes.Location = new System.Drawing.Point(120, 57);
+            this.txtTransportRes.Name = "txtTransportRes";
+            this.txtTransportRes.Size = new System.Drawing.Size(80, 21);
+            this.txtTransportRes.TabIndex = 5;
+            this.txtTransportRes.Text = "25";
+            //
+            // btnScanStart
+            //
+            this.btnScanStart.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.btnScanStart.Location = new System.Drawing.Point(10, 95);
+            this.btnScanStart.Name = "btnScanStart";
+            this.btnScanStart.Size = new System.Drawing.Size(150, 32);
+            this.btnScanStart.TabIndex = 6;
+            this.btnScanStart.Text = "연속 스캔 시작";
+            this.btnScanStart.UseVisualStyleBackColor = false;
+            this.btnScanStart.Click += new System.EventHandler(this.btnScanStart_Click);
+            //
+            // btnScanStop
+            //
+            this.btnScanStop.BackColor = System.Drawing.Color.Firebrick;
+            this.btnScanStop.ForeColor = System.Drawing.Color.White;
+            this.btnScanStop.Enabled = false;
+            this.btnScanStop.Location = new System.Drawing.Point(170, 95);
+            this.btnScanStop.Name = "btnScanStop";
+            this.btnScanStop.Size = new System.Drawing.Size(100, 32);
+            this.btnScanStop.TabIndex = 7;
+            this.btnScanStop.Text = "중지";
+            this.btnScanStop.UseVisualStyleBackColor = false;
+            this.btnScanStop.Click += new System.EventHandler(this.btnScanStop_Click);
+            //
+            // btnHome
+            //
+            this.btnHome.Location = new System.Drawing.Point(280, 95);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(150, 32);
+            this.btnHome.TabIndex = 8;
+            this.btnHome.Text = "Home (시작 위치로)";
+            this.btnHome.UseVisualStyleBackColor = true;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            //
+            // picHeightMap
+            //
+            this.picHeightMap.BackColor = System.Drawing.Color.Black;
+            this.picHeightMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picHeightMap.Location = new System.Drawing.Point(6, 152);
+            this.picHeightMap.Name = "picHeightMap";
+            this.picHeightMap.Size = new System.Drawing.Size(448, 116);
+            this.picHeightMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picHeightMap.TabIndex = 1;
+            this.picHeightMap.TabStop = false;
+            //
             // lblLog
             //
             this.lblLog.AutoSize = true;
@@ -431,6 +598,12 @@ namespace _3DVision
             this.tabPageSmartRay.ResumeLayout(false);
             this.grpSmartRay.ResumeLayout(false);
             this.grpSmartRay.PerformLayout();
+            this.grpGrab.ResumeLayout(false);
+            this.grpGrab.PerformLayout();
+            this.tabPageIntegration.ResumeLayout(false);
+            this.grpContinuousScan.ResumeLayout(false);
+            this.grpContinuousScan.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -471,5 +644,19 @@ namespace _3DVision
         private System.Windows.Forms.Button btnSrConnect;
         private System.Windows.Forms.Button btnSrDisconnect;
         private System.Windows.Forms.Button btnSrInfo;
+        private System.Windows.Forms.GroupBox grpGrab;
+        private System.Windows.Forms.Button btnGrab;
+        private System.Windows.Forms.TextBox txtProfileCount;
+        private System.Windows.Forms.Label lblProfileCount;
+        private System.Windows.Forms.TabPage tabPageIntegration;
+        private System.Windows.Forms.GroupBox grpContinuousScan;
+        private System.Windows.Forms.Label lblStartPos;
+        private System.Windows.Forms.TextBox txtStartPos;
+        private System.Windows.Forms.Label lblTransportRes;
+        private System.Windows.Forms.TextBox txtTransportRes;
+        private System.Windows.Forms.Button btnScanStart;
+        private System.Windows.Forms.Button btnScanStop;
+        private System.Windows.Forms.Button btnHome;
+        private System.Windows.Forms.PictureBox picHeightMap;
     }
 }

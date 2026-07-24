@@ -1,0 +1,59 @@
+# ACS 버전 (SPiiPlus ADK Suite v3.13.01)
+# SDK 위치(x64을 고정으로 사용해야함) → C:\Program Files (x86)\ACS Motion Control\SPiiPlus ADK Suite v3.13.01\SPiiPlus .NET Library\ACS.SPiiPlusNET.dll
+# 지금 우리 ACS 컨트롤러는 8축
+ → 8축 중에서 0번 축이 SmartRay 축
+#
+
+# ===== SmartRay ECCO 95.010+ =====
+# SDK 위치: C:\Program Files\SmartRaySDK 6.0.24.26\bin\x64\SmartRay_api_csharp-x64.dll (+ SmartRay_api-x64.dll 네이티브, 같은 폴더에 있어야 함)
+# 센서 IP: 192.168.111.200, 포트 40 (장치 검색(Discovery)으로 자동으로도 찾아짐)
+# 연결은 IP+포트로만 함. 별도 설정 파일을 읽어오지 않음 → 연결 직후 센서 상태는 "센서에 마지막으로 저장돼 있던 설정 그대로"임
+#  → 그래서 촬영 전에 코드에서 매번 강제로 SetImageAcquisitionType(PointCloud), SetDataTriggerMode(FreeRunning) 등을 세팅해줘야 함
+
+# [문제] 처음에 촬영(StartAcquisition)이 계속 실패했던 이유
+#  1차: Timeout → 트리거 모드를 안 정해줘서 외부 트리거(인코더 등) 기다리다 실패로 추정, FreeRunning으로 명시 설정해서 해결 시도
+#  2차: Error -5 (Function was not successful) → 캘리브레이션 데이터를 로드하는 단계를 빼먹었던 게 진짜 원인
+#   → IsCalibrationDataAvailableOnSensor() 확인 후 LoadCalibrationDataFromSensor() 호출해서 해결
+
+# [캘리브레이션 데이터란]
+#  - 센서 내부(레이저-카메라 사이 광학 기하구조)를 공장에서 개별 유닛마다 정밀 타겟으로 측정해서 만든 매핑 테이블. 센서 내장 메모리에 저장되어 출고됨.
+#  - 우리가 설정한 게 아니라 하드웨어에 원래 딸려오는 공장 기본값. LoadCalibrationDataFromSensor()는 그걸 세션에 불러와 활성화하는 것뿐.
+#  - 재캘리브레이션이 필요한 경우: 센서를 떨어뜨렸거나, 분해/재조립했거나, 레이저/카메라 모듈을 수리·교체했을 때 등 "물리적 광학 기준점"이 실제로 틀어졌을 때만. 보통 SmartRay 서비스센터에서 정밀 타겟으로 재수행.
+#  - 센서 장착 각도(예: 45도 → 15도)를 바꾸는 것만으로는 재캘리브레이션 불필요. 대신 아래를 다시 맞춰야 함:
+#     - SetTiltCorrectionPitch / SetTiltCorrectionYaw (장착 기울기를 알려줘서 좌표를 실제 세계 기준으로 보정)
+#     - 노출 시간/레이저 세기 (각도 바뀌면 반사광량 달라짐)
+#     - 측정 범위(FOV)가 바뀌므로 대상물이 유효 범위 안에 있는지 재확인
+#     - 센서 로컬좌표 ↔ ACS 모터/작업 좌표계 정렬(핸드아이 캘리브레이션)은 SDK가 아니라 우리가 직접 관리해야 하는 별도 작업 (나중 단계)
+
+# [무효 포인트 표시 방식]
+#  - SmartRay는 측정 실패한 포인트를 NaN이 아니라 특수 상수값으로 표시함 (SDK 헤더 sr_api_defines.h 기준)
+#    NONWORLDVALUE = -999997.0 / NONLUTVALUE = -999998.0 / BADWORLDVALUE = -999999.0
+#  - 그래서 유효/무효 필터링할 때 NaN 체크만으로는 안 되고, -999990 이하 값도 무효로 걸러내야 함
+
+# [진행 상황]
+#  1단계-A: ACS 연결 + 상태 확인(읽기전용) - 완료
+#  1단계-B: ACS 축 0 Enable + 상대이동(mm) + 정지버튼 - 완료 (축 0이 실제로 움직이는 것 확인)
+#  2단계-A: SmartRay 장치검색(Discovery)/연결/정보조회(읽기전용) - 완료
+#  2단계-B: SmartRay 레이저 ON + 단일 스냅샷 촬영 → 포인트클라우드 수신 - 완료 (유효 24458점, X:[0,9.9] Y:[-5.428,-0.13] Z:[-1.11,1.462])
+#  3단계: ACS 이동 → 완료 대기(WaitForInPosition) → SmartRay 자동 촬영 연동 - 코드 작성 완료, 테스트 예정
+#  프로젝트 구조: 3DVision/Acs (AcsMotionController.cs), 3DVision/SmartRay (SmartRayScannerController.cs), MainForm에 탭 3개(SmartRay/ACS/연동 테스트) 
+
+# 시작위치
+[17:40:20] [ACS 위치] 축 0: -18.779
+
+# 끝위치 
+[17:44:57] [ACS 위치] 축 0: 130.221
+
+# 트리거를 받고서 그랩 스타트 하는 방식
+# 트리거의 갯수를 몇개까지 받으면 스탑하겠고
+
+# 1) 그랩을 시작하면 센서의 세로폭이 5um정도일꺼고 최소 간격이 15um라서 그 사이가 비니까 보정하는 방식이잇고
+# 2) Transport Resolution을 25um, acs 25um 간격도 25um로 가져가서 비는곳이없도록 채우는 방식도잇고
+# 다른곳은 그렇게안쓰는것같음
+
+# 현재 테스트실 방식은 External +  input1 (따로선을빼서)
+#테스트실방식
+2) (Trigger Divider=25, 0.025mm)은 결국 "엔코더 25카운트=0.025mm 이동할 때마다 한 줄씩 찍어라"는 뜻이고
+
+
+# 현장은 External + Quaderate Encoder (모터에 직접연결)

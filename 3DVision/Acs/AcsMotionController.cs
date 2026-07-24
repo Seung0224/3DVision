@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Threading;
 using ACS.SPiiPlusNET;
 
 namespace _3DVision.Acs
@@ -70,6 +72,38 @@ namespace _3DVision.Acs
                 throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
 
             _api.ToPointAsync(MotionFlags.ACSC_AMF_RELATIVE, (Axis)axisIndex, distance);
+        }
+
+        // 절대좌표 이동(PTP). position은 축의 원점(홈) 기준 목표 위치.
+        public void MoveAbsolute(int axisIndex, double position)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
+
+            _api.ToPointAsync(MotionFlags.ACSC_NONE, (Axis)axisIndex, position);
+        }
+
+        // 이동 명령 이후 해당 축이 정지 상태(INPOS)가 될 때까지 대기한다.
+        // 그랩(촬영) 전에 반드시 이동이 끝났는지 확인하기 위한 용도.
+        public bool WaitForInPosition(int axisIndex, int timeoutMilliseconds)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
+
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.ElapsedMilliseconds < timeoutMilliseconds)
+            {
+                MotorStates state = GetAxisState(axisIndex);
+                bool inPosition = (state & MotorStates.ACSC_MST_INPOS) != 0;
+                bool moving = (state & MotorStates.ACSC_MST_MOVE) != 0;
+
+                if (inPosition && !moving)
+                    return true;
+
+                Thread.Sleep(20);
+            }
+
+            return false;
         }
 
         // 비상 정지: 해당 축의 모션을 즉시 취소한다.
