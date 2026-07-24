@@ -47,6 +47,40 @@ namespace _3DVision.Acs
             return _api.GetMotorState((Axis)axisIndex);
         }
 
+        public void EnableAxis(int axisIndex)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
+
+            _api.EnableAsync((Axis)axisIndex);
+        }
+
+        public void DisableAxis(int axisIndex)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
+
+            _api.DisableAsync((Axis)axisIndex);
+        }
+
+        // 현재 위치 기준 상대 이동(PTP). distance가 양수면 +방향, 음수면 -방향으로 이동한다.
+        public void MoveRelative(int axisIndex, double distance)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException("컨트롤러에 연결되어 있지 않습니다.");
+
+            _api.ToPointAsync(MotionFlags.ACSC_AMF_RELATIVE, (Axis)axisIndex, distance);
+        }
+
+        // 비상 정지: 해당 축의 모션을 즉시 취소한다.
+        public void Stop(int axisIndex)
+        {
+            if (!IsConnected)
+                return;
+
+            _api.KillAsync((Axis)axisIndex);
+        }
+
         public void Dispose()
         {
             Disconnect();

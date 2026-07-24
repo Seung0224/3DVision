@@ -36,10 +36,22 @@ namespace _3DVision
             this.btnConnect = new System.Windows.Forms.Button();
             this.txtIp = new System.Windows.Forms.TextBox();
             this.lblIp = new System.Windows.Forms.Label();
+            this.grpMove = new System.Windows.Forms.GroupBox();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.btnMovePlus = new System.Windows.Forms.Button();
+            this.btnMoveMinus = new System.Windows.Forms.Button();
+            this.txtDistance = new System.Windows.Forms.TextBox();
+            this.lblDistance = new System.Windows.Forms.Label();
+            this.btnDisable = new System.Windows.Forms.Button();
+            this.btnEnable = new System.Windows.Forms.Button();
+            this.numMoveAxis = new System.Windows.Forms.NumericUpDown();
+            this.lblMoveAxis = new System.Windows.Forms.Label();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.grpAcs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAxis)).BeginInit();
+            this.grpMove.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).BeginInit();
             this.SuspendLayout();
             //
             // grpAcs
@@ -122,10 +134,115 @@ namespace _3DVision
             this.lblIp.TabIndex = 0;
             this.lblIp.Text = "컨트롤러 IP";
             //
+            // grpMove
+            //
+            this.grpMove.Controls.Add(this.btnStop);
+            this.grpMove.Controls.Add(this.btnMovePlus);
+            this.grpMove.Controls.Add(this.btnMoveMinus);
+            this.grpMove.Controls.Add(this.txtDistance);
+            this.grpMove.Controls.Add(this.lblDistance);
+            this.grpMove.Controls.Add(this.btnDisable);
+            this.grpMove.Controls.Add(this.btnEnable);
+            this.grpMove.Controls.Add(this.numMoveAxis);
+            this.grpMove.Controls.Add(this.lblMoveAxis);
+            this.grpMove.Location = new System.Drawing.Point(12, 138);
+            this.grpMove.Name = "grpMove";
+            this.grpMove.Size = new System.Drawing.Size(460, 110);
+            this.grpMove.TabIndex = 3;
+            this.grpMove.TabStop = false;
+            this.grpMove.Text = "이동 테스트 (1단계-B: 실제로 모터가 움직입니다. 주의)";
+            //
+            // btnStop
+            //
+            this.btnStop.BackColor = System.Drawing.Color.Firebrick;
+            this.btnStop.ForeColor = System.Drawing.Color.White;
+            this.btnStop.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
+            this.btnStop.Location = new System.Drawing.Point(300, 20);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(150, 65);
+            this.btnStop.TabIndex = 8;
+            this.btnStop.Text = "정지 (비상)";
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            //
+            // btnMovePlus
+            //
+            this.btnMovePlus.Location = new System.Drawing.Point(220, 55);
+            this.btnMovePlus.Name = "btnMovePlus";
+            this.btnMovePlus.Size = new System.Drawing.Size(75, 28);
+            this.btnMovePlus.TabIndex = 7;
+            this.btnMovePlus.Text = "이동+ ▶";
+            this.btnMovePlus.UseVisualStyleBackColor = true;
+            this.btnMovePlus.Click += new System.EventHandler(this.btnMovePlus_Click);
+            //
+            // btnMoveMinus
+            //
+            this.btnMoveMinus.Location = new System.Drawing.Point(140, 55);
+            this.btnMoveMinus.Name = "btnMoveMinus";
+            this.btnMoveMinus.Size = new System.Drawing.Size(75, 28);
+            this.btnMoveMinus.TabIndex = 6;
+            this.btnMoveMinus.Text = "◀ -이동";
+            this.btnMoveMinus.UseVisualStyleBackColor = true;
+            this.btnMoveMinus.Click += new System.EventHandler(this.btnMoveMinus_Click);
+            //
+            // txtDistance
+            //
+            this.txtDistance.Location = new System.Drawing.Point(80, 57);
+            this.txtDistance.Name = "txtDistance";
+            this.txtDistance.Size = new System.Drawing.Size(50, 21);
+            this.txtDistance.TabIndex = 5;
+            this.txtDistance.Text = "5";
+            //
+            // lblDistance
+            //
+            this.lblDistance.AutoSize = true;
+            this.lblDistance.Location = new System.Drawing.Point(10, 60);
+            this.lblDistance.Name = "lblDistance";
+            this.lblDistance.Size = new System.Drawing.Size(58, 12);
+            this.lblDistance.TabIndex = 4;
+            this.lblDistance.Text = "거리(mm)";
+            //
+            // btnDisable
+            //
+            this.btnDisable.Location = new System.Drawing.Point(220, 20);
+            this.btnDisable.Name = "btnDisable";
+            this.btnDisable.Size = new System.Drawing.Size(75, 28);
+            this.btnDisable.TabIndex = 3;
+            this.btnDisable.Text = "Disable";
+            this.btnDisable.UseVisualStyleBackColor = true;
+            this.btnDisable.Click += new System.EventHandler(this.btnDisable_Click);
+            //
+            // btnEnable
+            //
+            this.btnEnable.Location = new System.Drawing.Point(140, 20);
+            this.btnEnable.Name = "btnEnable";
+            this.btnEnable.Size = new System.Drawing.Size(75, 28);
+            this.btnEnable.TabIndex = 2;
+            this.btnEnable.Text = "Enable";
+            this.btnEnable.UseVisualStyleBackColor = true;
+            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
+            //
+            // numMoveAxis
+            //
+            this.numMoveAxis.Location = new System.Drawing.Point(80, 22);
+            this.numMoveAxis.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
+            this.numMoveAxis.Name = "numMoveAxis";
+            this.numMoveAxis.Size = new System.Drawing.Size(50, 21);
+            this.numMoveAxis.TabIndex = 1;
+            //
+            // lblMoveAxis
+            //
+            this.lblMoveAxis.AutoSize = true;
+            this.lblMoveAxis.Location = new System.Drawing.Point(10, 25);
+            this.lblMoveAxis.Name = "lblMoveAxis";
+            this.lblMoveAxis.Size = new System.Drawing.Size(58, 12);
+            this.lblMoveAxis.TabIndex = 0;
+            this.lblMoveAxis.Text = "이동할 축";
+            //
             // lblLog
             //
             this.lblLog.AutoSize = true;
-            this.lblLog.Location = new System.Drawing.Point(13, 142);
+            this.lblLog.Location = new System.Drawing.Point(13, 258);
             this.lblLog.Name = "lblLog";
             this.lblLog.Size = new System.Drawing.Size(24, 12);
             this.lblLog.TabIndex = 1;
@@ -133,28 +250,32 @@ namespace _3DVision
             //
             // txtLog
             //
-            this.txtLog.Location = new System.Drawing.Point(12, 158);
+            this.txtLog.Location = new System.Drawing.Point(12, 274);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(460, 260);
+            this.txtLog.Size = new System.Drawing.Size(460, 200);
             this.txtLog.TabIndex = 2;
             //
-            // Form1
+            // MainForm
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 431);
+            this.ClientSize = new System.Drawing.Size(484, 490);
+            this.Controls.Add(this.grpMove);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblLog);
             this.Controls.Add(this.grpAcs);
-            this.Name = "Form1";
-            this.Text = "3DVision - ACS 모터 테스트 (1단계-A)";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Name = "MainForm";
+            this.Text = "3DVision - ACS 모터 테스트 (1단계-B)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.grpAcs.ResumeLayout(false);
             this.grpAcs.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAxis)).EndInit();
+            this.grpMove.ResumeLayout(false);
+            this.grpMove.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -172,5 +293,15 @@ namespace _3DVision
         private System.Windows.Forms.NumericUpDown numAxis;
         private System.Windows.Forms.Label lblLog;
         private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.GroupBox grpMove;
+        private System.Windows.Forms.Label lblMoveAxis;
+        private System.Windows.Forms.NumericUpDown numMoveAxis;
+        private System.Windows.Forms.Button btnEnable;
+        private System.Windows.Forms.Button btnDisable;
+        private System.Windows.Forms.Label lblDistance;
+        private System.Windows.Forms.TextBox txtDistance;
+        private System.Windows.Forms.Button btnMoveMinus;
+        private System.Windows.Forms.Button btnMovePlus;
+        private System.Windows.Forms.Button btnStop;
     }
 }

@@ -68,7 +68,97 @@ namespace _3DVision
             }
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void btnEnable_Click(object sender, EventArgs e)
+        {
+            int axisIndex = (int)numMoveAxis.Value;
+            try
+            {
+                _acs.EnableAxis(axisIndex);
+                Log(string.Format("축 {0} Enable 명령을 보냈습니다.", axisIndex));
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log(ex.Message);
+            }
+            catch (COMException ex)
+            {
+                Log("Enable 실패 (COMException): " + ex.Message);
+            }
+            catch (ACSException ex)
+            {
+                Log("Enable 실패 (ACSException): " + ex.Message);
+            }
+        }
+
+        private void btnDisable_Click(object sender, EventArgs e)
+        {
+            int axisIndex = (int)numMoveAxis.Value;
+            try
+            {
+                _acs.DisableAxis(axisIndex);
+                Log(string.Format("축 {0} Disable 명령을 보냈습니다.", axisIndex));
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log(ex.Message);
+            }
+            catch (COMException ex)
+            {
+                Log("Disable 실패 (COMException): " + ex.Message);
+            }
+            catch (ACSException ex)
+            {
+                Log("Disable 실패 (ACSException): " + ex.Message);
+            }
+        }
+
+        private void btnMovePlus_Click(object sender, EventArgs e)
+        {
+            MoveRelative(+1);
+        }
+
+        private void btnMoveMinus_Click(object sender, EventArgs e)
+        {
+            MoveRelative(-1);
+        }
+
+        private void MoveRelative(int direction)
+        {
+            int axisIndex = (int)numMoveAxis.Value;
+
+            if (!double.TryParse(txtDistance.Text.Trim(), out double distance))
+            {
+                Log("거리 값이 올바르지 않습니다: " + txtDistance.Text);
+                return;
+            }
+
+            try
+            {
+                _acs.MoveRelative(axisIndex, distance * direction);
+                Log(string.Format("축 {0} 을(를) {1}만큼 이동 명령을 보냈습니다.", axisIndex, distance * direction));
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log(ex.Message);
+            }
+            catch (COMException ex)
+            {
+                Log("이동 실패 (COMException): " + ex.Message);
+            }
+            catch (ACSException ex)
+            {
+                Log("이동 실패 (ACSException): " + ex.Message);
+            }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            int axisIndex = (int)numMoveAxis.Value;
+            _acs.Stop(axisIndex);
+            Log(string.Format("축 {0} 정지 명령을 보냈습니다.", axisIndex));
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             _acs.Dispose();
         }
