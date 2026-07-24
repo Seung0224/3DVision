@@ -28,6 +28,8 @@ namespace _3DVision
         /// </summary>
         private void InitializeComponent()
         {
+            this.tabMain = new System.Windows.Forms.TabControl();
+            this.tabPageAcs = new System.Windows.Forms.TabPage();
             this.grpAcs = new System.Windows.Forms.GroupBox();
             this.lblAxis = new System.Windows.Forms.Label();
             this.numAxis = new System.Windows.Forms.NumericUpDown();
@@ -46,13 +48,50 @@ namespace _3DVision
             this.btnEnable = new System.Windows.Forms.Button();
             this.numMoveAxis = new System.Windows.Forms.NumericUpDown();
             this.lblMoveAxis = new System.Windows.Forms.Label();
+            this.tabPageSmartRay = new System.Windows.Forms.TabPage();
+            this.grpSmartRay = new System.Windows.Forms.GroupBox();
+            this.btnSrInfo = new System.Windows.Forms.Button();
+            this.btnSrDisconnect = new System.Windows.Forms.Button();
+            this.btnSrConnect = new System.Windows.Forms.Button();
+            this.txtSrPort = new System.Windows.Forms.TextBox();
+            this.lblSrPort = new System.Windows.Forms.Label();
+            this.txtSrIp = new System.Windows.Forms.TextBox();
+            this.lblSrIp = new System.Windows.Forms.Label();
+            this.cmbSensors = new System.Windows.Forms.ComboBox();
+            this.btnDiscover = new System.Windows.Forms.Button();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
+            this.tabMain.SuspendLayout();
+            this.tabPageAcs.SuspendLayout();
             this.grpAcs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAxis)).BeginInit();
             this.grpMove.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).BeginInit();
+            this.tabPageSmartRay.SuspendLayout();
+            this.grpSmartRay.SuspendLayout();
             this.SuspendLayout();
+            //
+            // tabMain
+            //
+            this.tabMain.Controls.Add(this.tabPageAcs);
+            this.tabMain.Controls.Add(this.tabPageSmartRay);
+            this.tabMain.Location = new System.Drawing.Point(12, 12);
+            this.tabMain.Name = "tabMain";
+            this.tabMain.SelectedIndex = 0;
+            this.tabMain.Size = new System.Drawing.Size(468, 300);
+            this.tabMain.TabIndex = 0;
+            //
+            // tabPageAcs
+            //
+            this.tabPageAcs.Controls.Add(this.grpAcs);
+            this.tabPageAcs.Controls.Add(this.grpMove);
+            this.tabPageAcs.Location = new System.Drawing.Point(4, 22);
+            this.tabPageAcs.Name = "tabPageAcs";
+            this.tabPageAcs.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageAcs.Size = new System.Drawing.Size(460, 274);
+            this.tabPageAcs.TabIndex = 0;
+            this.tabPageAcs.Text = "ACS 모터";
+            this.tabPageAcs.UseVisualStyleBackColor = true;
             //
             // grpAcs
             //
@@ -63,12 +102,12 @@ namespace _3DVision
             this.grpAcs.Controls.Add(this.btnConnect);
             this.grpAcs.Controls.Add(this.txtIp);
             this.grpAcs.Controls.Add(this.lblIp);
-            this.grpAcs.Location = new System.Drawing.Point(12, 12);
+            this.grpAcs.Location = new System.Drawing.Point(6, 6);
             this.grpAcs.Name = "grpAcs";
-            this.grpAcs.Size = new System.Drawing.Size(460, 120);
+            this.grpAcs.Size = new System.Drawing.Size(448, 120);
             this.grpAcs.TabIndex = 0;
             this.grpAcs.TabStop = false;
-            this.grpAcs.Text = "ACS 모터 (1단계-A: 연결/상태 확인)";
+            this.grpAcs.Text = "1단계-A: 연결/상태 확인";
             //
             // lblAxis
             //
@@ -145,19 +184,19 @@ namespace _3DVision
             this.grpMove.Controls.Add(this.btnEnable);
             this.grpMove.Controls.Add(this.numMoveAxis);
             this.grpMove.Controls.Add(this.lblMoveAxis);
-            this.grpMove.Location = new System.Drawing.Point(12, 138);
+            this.grpMove.Location = new System.Drawing.Point(6, 132);
             this.grpMove.Name = "grpMove";
-            this.grpMove.Size = new System.Drawing.Size(460, 110);
-            this.grpMove.TabIndex = 3;
+            this.grpMove.Size = new System.Drawing.Size(448, 110);
+            this.grpMove.TabIndex = 1;
             this.grpMove.TabStop = false;
-            this.grpMove.Text = "이동 테스트 (1단계-B: 실제로 모터가 움직입니다. 주의)";
+            this.grpMove.Text = "1단계-B: 이동 테스트 (실제로 모터가 움직입니다. 주의)";
             //
             // btnStop
             //
             this.btnStop.BackColor = System.Drawing.Color.Firebrick;
             this.btnStop.ForeColor = System.Drawing.Color.White;
             this.btnStop.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
-            this.btnStop.Location = new System.Drawing.Point(300, 20);
+            this.btnStop.Location = new System.Drawing.Point(290, 20);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(150, 65);
             this.btnStop.TabIndex = 8;
@@ -169,7 +208,7 @@ namespace _3DVision
             //
             this.btnMovePlus.Location = new System.Drawing.Point(220, 55);
             this.btnMovePlus.Name = "btnMovePlus";
-            this.btnMovePlus.Size = new System.Drawing.Size(75, 28);
+            this.btnMovePlus.Size = new System.Drawing.Size(60, 28);
             this.btnMovePlus.TabIndex = 7;
             this.btnMovePlus.Text = "이동+ ▶";
             this.btnMovePlus.UseVisualStyleBackColor = true;
@@ -177,9 +216,9 @@ namespace _3DVision
             //
             // btnMoveMinus
             //
-            this.btnMoveMinus.Location = new System.Drawing.Point(140, 55);
+            this.btnMoveMinus.Location = new System.Drawing.Point(150, 55);
             this.btnMoveMinus.Name = "btnMoveMinus";
-            this.btnMoveMinus.Size = new System.Drawing.Size(75, 28);
+            this.btnMoveMinus.Size = new System.Drawing.Size(60, 28);
             this.btnMoveMinus.TabIndex = 6;
             this.btnMoveMinus.Text = "◀ -이동";
             this.btnMoveMinus.UseVisualStyleBackColor = true;
@@ -239,10 +278,122 @@ namespace _3DVision
             this.lblMoveAxis.TabIndex = 0;
             this.lblMoveAxis.Text = "이동할 축";
             //
+            // tabPageSmartRay
+            //
+            this.tabPageSmartRay.Controls.Add(this.grpSmartRay);
+            this.tabPageSmartRay.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSmartRay.Name = "tabPageSmartRay";
+            this.tabPageSmartRay.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageSmartRay.Size = new System.Drawing.Size(460, 274);
+            this.tabPageSmartRay.TabIndex = 1;
+            this.tabPageSmartRay.Text = "SmartRay 스캐너";
+            this.tabPageSmartRay.UseVisualStyleBackColor = true;
+            //
+            // grpSmartRay
+            //
+            this.grpSmartRay.Controls.Add(this.btnSrInfo);
+            this.grpSmartRay.Controls.Add(this.btnSrDisconnect);
+            this.grpSmartRay.Controls.Add(this.btnSrConnect);
+            this.grpSmartRay.Controls.Add(this.txtSrPort);
+            this.grpSmartRay.Controls.Add(this.lblSrPort);
+            this.grpSmartRay.Controls.Add(this.txtSrIp);
+            this.grpSmartRay.Controls.Add(this.lblSrIp);
+            this.grpSmartRay.Controls.Add(this.cmbSensors);
+            this.grpSmartRay.Controls.Add(this.btnDiscover);
+            this.grpSmartRay.Location = new System.Drawing.Point(6, 6);
+            this.grpSmartRay.Name = "grpSmartRay";
+            this.grpSmartRay.Size = new System.Drawing.Size(448, 150);
+            this.grpSmartRay.TabIndex = 0;
+            this.grpSmartRay.TabStop = false;
+            this.grpSmartRay.Text = "2단계-A: 검색/연결/정보 확인";
+            //
+            // btnDiscover
+            //
+            this.btnDiscover.Location = new System.Drawing.Point(10, 20);
+            this.btnDiscover.Name = "btnDiscover";
+            this.btnDiscover.Size = new System.Drawing.Size(100, 28);
+            this.btnDiscover.TabIndex = 0;
+            this.btnDiscover.Text = "장치 검색";
+            this.btnDiscover.UseVisualStyleBackColor = true;
+            this.btnDiscover.Click += new System.EventHandler(this.btnDiscover_Click);
+            //
+            // cmbSensors
+            //
+            this.cmbSensors.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSensors.FormattingEnabled = true;
+            this.cmbSensors.Location = new System.Drawing.Point(120, 22);
+            this.cmbSensors.Name = "cmbSensors";
+            this.cmbSensors.Size = new System.Drawing.Size(318, 20);
+            this.cmbSensors.TabIndex = 1;
+            this.cmbSensors.SelectedIndexChanged += new System.EventHandler(this.cmbSensors_SelectedIndexChanged);
+            //
+            // lblSrIp
+            //
+            this.lblSrIp.AutoSize = true;
+            this.lblSrIp.Location = new System.Drawing.Point(10, 60);
+            this.lblSrIp.Name = "lblSrIp";
+            this.lblSrIp.Size = new System.Drawing.Size(19, 12);
+            this.lblSrIp.TabIndex = 2;
+            this.lblSrIp.Text = "IP";
+            //
+            // txtSrIp
+            //
+            this.txtSrIp.Location = new System.Drawing.Point(35, 57);
+            this.txtSrIp.Name = "txtSrIp";
+            this.txtSrIp.Size = new System.Drawing.Size(120, 21);
+            this.txtSrIp.TabIndex = 3;
+            //
+            // lblSrPort
+            //
+            this.lblSrPort.AutoSize = true;
+            this.lblSrPort.Location = new System.Drawing.Point(165, 60);
+            this.lblSrPort.Name = "lblSrPort";
+            this.lblSrPort.Size = new System.Drawing.Size(29, 12);
+            this.lblSrPort.TabIndex = 4;
+            this.lblSrPort.Text = "포트";
+            //
+            // txtSrPort
+            //
+            this.txtSrPort.Location = new System.Drawing.Point(200, 57);
+            this.txtSrPort.Name = "txtSrPort";
+            this.txtSrPort.Size = new System.Drawing.Size(50, 21);
+            this.txtSrPort.TabIndex = 5;
+            this.txtSrPort.Text = "40";
+            //
+            // btnSrConnect
+            //
+            this.btnSrConnect.Location = new System.Drawing.Point(260, 55);
+            this.btnSrConnect.Name = "btnSrConnect";
+            this.btnSrConnect.Size = new System.Drawing.Size(85, 26);
+            this.btnSrConnect.TabIndex = 6;
+            this.btnSrConnect.Text = "연결";
+            this.btnSrConnect.UseVisualStyleBackColor = true;
+            this.btnSrConnect.Click += new System.EventHandler(this.btnSrConnect_Click);
+            //
+            // btnSrDisconnect
+            //
+            this.btnSrDisconnect.Location = new System.Drawing.Point(350, 55);
+            this.btnSrDisconnect.Name = "btnSrDisconnect";
+            this.btnSrDisconnect.Size = new System.Drawing.Size(95, 26);
+            this.btnSrDisconnect.TabIndex = 7;
+            this.btnSrDisconnect.Text = "연결 해제";
+            this.btnSrDisconnect.UseVisualStyleBackColor = true;
+            this.btnSrDisconnect.Click += new System.EventHandler(this.btnSrDisconnect_Click);
+            //
+            // btnSrInfo
+            //
+            this.btnSrInfo.Location = new System.Drawing.Point(10, 95);
+            this.btnSrInfo.Name = "btnSrInfo";
+            this.btnSrInfo.Size = new System.Drawing.Size(200, 30);
+            this.btnSrInfo.TabIndex = 8;
+            this.btnSrInfo.Text = "정보 확인 (읽기전용)";
+            this.btnSrInfo.UseVisualStyleBackColor = true;
+            this.btnSrInfo.Click += new System.EventHandler(this.btnSrInfo_Click);
+            //
             // lblLog
             //
             this.lblLog.AutoSize = true;
-            this.lblLog.Location = new System.Drawing.Point(13, 258);
+            this.lblLog.Location = new System.Drawing.Point(13, 322);
             this.lblLog.Name = "lblLog";
             this.lblLog.Size = new System.Drawing.Size(24, 12);
             this.lblLog.TabIndex = 1;
@@ -250,32 +401,36 @@ namespace _3DVision
             //
             // txtLog
             //
-            this.txtLog.Location = new System.Drawing.Point(12, 274);
+            this.txtLog.Location = new System.Drawing.Point(12, 338);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(460, 200);
+            this.txtLog.Size = new System.Drawing.Size(468, 230);
             this.txtLog.TabIndex = 2;
             //
             // MainForm
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 490);
-            this.Controls.Add(this.grpMove);
+            this.ClientSize = new System.Drawing.Size(492, 590);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblLog);
-            this.Controls.Add(this.grpAcs);
+            this.Controls.Add(this.tabMain);
             this.Name = "MainForm";
-            this.Text = "3DVision - ACS 모터 테스트 (1단계-B)";
+            this.Text = "3DVision - ACS/SmartRay 연동 테스트";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.tabMain.ResumeLayout(false);
+            this.tabPageAcs.ResumeLayout(false);
             this.grpAcs.ResumeLayout(false);
             this.grpAcs.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAxis)).EndInit();
             this.grpMove.ResumeLayout(false);
             this.grpMove.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).EndInit();
+            this.tabPageSmartRay.ResumeLayout(false);
+            this.grpSmartRay.ResumeLayout(false);
+            this.grpSmartRay.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -283,6 +438,8 @@ namespace _3DVision
 
         #endregion
 
+        private System.Windows.Forms.TabControl tabMain;
+        private System.Windows.Forms.TabPage tabPageAcs;
         private System.Windows.Forms.GroupBox grpAcs;
         private System.Windows.Forms.Label lblIp;
         private System.Windows.Forms.TextBox txtIp;
@@ -303,5 +460,16 @@ namespace _3DVision
         private System.Windows.Forms.Button btnMoveMinus;
         private System.Windows.Forms.Button btnMovePlus;
         private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.TabPage tabPageSmartRay;
+        private System.Windows.Forms.GroupBox grpSmartRay;
+        private System.Windows.Forms.Button btnDiscover;
+        private System.Windows.Forms.ComboBox cmbSensors;
+        private System.Windows.Forms.Label lblSrIp;
+        private System.Windows.Forms.TextBox txtSrIp;
+        private System.Windows.Forms.Label lblSrPort;
+        private System.Windows.Forms.TextBox txtSrPort;
+        private System.Windows.Forms.Button btnSrConnect;
+        private System.Windows.Forms.Button btnSrDisconnect;
+        private System.Windows.Forms.Button btnSrInfo;
     }
 }
