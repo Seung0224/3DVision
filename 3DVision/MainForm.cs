@@ -420,85 +420,15 @@ namespace _3DVision
         }
 
         // 백그라운드 스레드에서 호출된다. 비트맵을 만든 뒤 UI 스레드로 넘겨서 PictureBox에 표시한다.
-        // 높이맵(위에서 본 그레이스케일)과 포인트클라우드(등각 투영, 의사 3D)를 같이 갱신한다.
         private void ShowZMapImage(ZMapResult result)
         {
             var heightMapBitmap = BuildZMapImage(result);
-            var pointCloudBitmap = BuildPointCloudImage(result, picPointCloud.Width, picPointCloud.Height);
 
             Invoke(new Action(() =>
             {
                 picHeightMap.Image?.Dispose();
                 picHeightMap.Image = heightMapBitmap;
-
-                picPointCloud.Image?.Dispose();
-                picPointCloud.Image = pointCloudBitmap;
             }));
-        }
-
-        // ZMap 격자를 열(col)/행(row)/높이(z) 기준으로 간단한 등각(isometric) 투영해 흩뿌린다.
-        // 진짜 3D 뷰어(회전/줌)는 아니지만, 위에서만 보는 높이맵과 달리 입체감을 볼 수 있다.
-        // 참고: row(행) 방향은 실제 mm 거리가 아니라 촬영 순서 기준이라 세로 비율은 정확하지 않다.
-        private static Bitmap BuildPointCloudImage(ZMapResult result, int imageWidth, int imageHeight)
-        {
-            var bitmap = new Bitmap(Math.Max(1, imageWidth), Math.Max(1, imageHeight));
-            using (var g = Graphics.FromImage(bitmap))
-                g.Clear(Color.Black);
-
-            if (result.ZData == null || result.ZData.Length < result.Width * result.Height)
-                return bitmap;
-
-            ushort minRaw = ushort.MaxValue, maxRaw = 0;
-            foreach (var v in result.ZData)
-            {
-                if (v == 0)
-                    continue;
-                if (v < minRaw) minRaw = v;
-                if (v > maxRaw) maxRaw = v;
-            }
-
-            if (maxRaw <= minRaw)
-                return bitmap;
-
-            float zRange = maxRaw - minRaw;
-            int w = result.Width;
-            int h = result.Height;
-
-            const double AngleDeg = 30.0;
-            double cos = Math.Cos(AngleDeg * Math.PI / 180.0);
-            double sin = Math.Sin(AngleDeg * Math.PI / 180.0);
-
-            double spanX = (w + h) * cos;
-            double scaleXY = spanX > 0 ? (bitmap.Width * 0.9) / spanX : 1.0;
-            double heightScale = bitmap.Height * 0.5;
-            double originX = bitmap.Width / 2.0;
-            double originY = bitmap.Height * 0.8;
-
-            for (int row = 0; row < h; row++)
-            {
-                for (int col = 0; col < w; col++)
-                {
-                    ushort v = result.ZData[row * w + col];
-                    if (v == 0)
-                        continue;
-
-                    float zNorm = (v - minRaw) / zRange;
-
-                    double sx = originX + (col - row) * cos * scaleXY;
-                    double sy = originY - (col + row) * sin * scaleXY * 0.5 - zNorm * heightScale;
-
-                    int px = (int)sx;
-                    int py = (int)sy;
-                    if (px < 0 || px >= bitmap.Width || py < 0 || py >= bitmap.Height)
-                        continue;
-
-                    int gray = (int)(60 + zNorm * 195);
-                    gray = Math.Max(0, Math.Min(255, gray));
-                    bitmap.SetPixel(px, py, Color.FromArgb(gray, gray, 255));
-                }
-            }
-
-            return bitmap;
         }
 
         // ZMap은 이미 Width x Height 격자로 정렬되어 있으므로, 흩뿌릴 필요 없이 그대로 그레이스케일로 매핑한다.

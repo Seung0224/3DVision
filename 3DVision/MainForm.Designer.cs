@@ -74,8 +74,6 @@ namespace _3DVision
             this.lblSmartRayStatus = new System.Windows.Forms.Label();
             this.picHeightMap = new System.Windows.Forms.PictureBox();
             this.lblHeightMap = new System.Windows.Forms.Label();
-            this.picPointCloud = new System.Windows.Forms.PictureBox();
-            this.lblPointCloud = new System.Windows.Forms.Label();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.tabMain.SuspendLayout();
@@ -90,14 +88,16 @@ namespace _3DVision
             this.tabPageIntegration.SuspendLayout();
             this.grpContinuousScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picPointCloud)).BeginInit();
             this.SuspendLayout();
             //
             // tabMain
             //
+            this.tabMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabMain.Controls.Add(this.tabPageIntegration);
             this.tabMain.Controls.Add(this.tabPageSmartRay);
             this.tabMain.Controls.Add(this.tabPageAcs);
-            this.tabMain.Controls.Add(this.tabPageIntegration);
             this.tabMain.Location = new System.Drawing.Point(12, 12);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
@@ -459,8 +459,6 @@ namespace _3DVision
             //
             this.tabPageIntegration.Controls.Add(this.picHeightMap);
             this.tabPageIntegration.Controls.Add(this.lblHeightMap);
-            this.tabPageIntegration.Controls.Add(this.picPointCloud);
-            this.tabPageIntegration.Controls.Add(this.lblPointCloud);
             this.tabPageIntegration.Controls.Add(this.grpContinuousScan);
             this.tabPageIntegration.Location = new System.Drawing.Point(4, 22);
             this.tabPageIntegration.Name = "tabPageIntegration";
@@ -560,7 +558,7 @@ namespace _3DVision
             // lblHeightMap
             //
             this.lblHeightMap.AutoSize = true;
-            this.lblHeightMap.Location = new System.Drawing.Point(6, 150);
+            this.lblHeightMap.Location = new System.Drawing.Point(470, 6);
             this.lblHeightMap.Name = "lblHeightMap";
             this.lblHeightMap.Size = new System.Drawing.Size(100, 12);
             this.lblHeightMap.TabIndex = 7;
@@ -568,37 +566,21 @@ namespace _3DVision
             //
             // picHeightMap
             //
+            this.picHeightMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.picHeightMap.BackColor = System.Drawing.Color.Black;
             this.picHeightMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picHeightMap.Location = new System.Drawing.Point(6, 166);
+            this.picHeightMap.Location = new System.Drawing.Point(470, 22);
             this.picHeightMap.Name = "picHeightMap";
-            this.picHeightMap.Size = new System.Drawing.Size(468, 180);
+            this.picHeightMap.Size = new System.Drawing.Size(492, 326);
             this.picHeightMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picHeightMap.TabIndex = 1;
             this.picHeightMap.TabStop = false;
             //
-            // lblPointCloud
-            //
-            this.lblPointCloud.AutoSize = true;
-            this.lblPointCloud.Location = new System.Drawing.Point(482, 150);
-            this.lblPointCloud.Name = "lblPointCloud";
-            this.lblPointCloud.Size = new System.Drawing.Size(130, 12);
-            this.lblPointCloud.TabIndex = 8;
-            this.lblPointCloud.Text = "포인트클라우드 (등각 투영, 의사 3D)";
-            //
-            // picPointCloud
-            //
-            this.picPointCloud.BackColor = System.Drawing.Color.Black;
-            this.picPointCloud.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picPointCloud.Location = new System.Drawing.Point(482, 166);
-            this.picPointCloud.Name = "picPointCloud";
-            this.picPointCloud.Size = new System.Drawing.Size(468, 180);
-            this.picPointCloud.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picPointCloud.TabIndex = 9;
-            this.picPointCloud.TabStop = false;
-            //
             // lblLog
             //
+            this.lblLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblLog.AutoSize = true;
             this.lblLog.Location = new System.Drawing.Point(13, 402);
             this.lblLog.Name = "lblLog";
@@ -608,6 +590,8 @@ namespace _3DVision
             //
             // txtLog
             //
+            this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtLog.Location = new System.Drawing.Point(12, 418);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
@@ -621,6 +605,7 @@ namespace _3DVision
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 650);
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblLog);
             this.Controls.Add(this.tabMain);
@@ -645,7 +630,6 @@ namespace _3DVision
             this.grpContinuousScan.ResumeLayout(false);
             this.grpContinuousScan.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picPointCloud)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -701,7 +685,5 @@ namespace _3DVision
         private System.Windows.Forms.Label lblSmartRayStatus;
         private System.Windows.Forms.PictureBox picHeightMap;
         private System.Windows.Forms.Label lblHeightMap;
-        private System.Windows.Forms.PictureBox picPointCloud;
-        private System.Windows.Forms.Label lblPointCloud;
     }
 }
