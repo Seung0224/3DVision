@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACS.SPiiPlusNET;
@@ -16,11 +15,55 @@ namespace _3DVision
         private readonly AcsMotionController _acs = new AcsMotionController();
         private readonly SmartRayScannerController _smartRay = new SmartRayScannerController();
         private DetectedSensor[] _discoveredSensors = new DetectedSensor[0];
-        private CancellationTokenSource _sweepCts;
 
         public MainForm()
         {
             InitializeComponent();
+        }
+
+        // 프로그램을 켜면 ACS와 SmartRay에 자동으로 연결을 시도한다. 둘 다 네트워크 연결이라 약간 시간이
+        // 걸릴 수 있어 백그라운드에서 실행하고, 끝나면 상태 텍스트를 갱신한다.
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            UpdateConnectionStatusLabels();
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    _acs.Connect(txtIp.Text.Trim());
+                    LogSafe("[자동연결] ACS 연결 성공: " + txtIp.Text.Trim());
+                }
+                catch (Exception ex)
+                {
+                    LogSafe(string.Format("[자동연결] ACS 연결 실패 ({0}): {1}", ex.GetType().Name, ex.Message));
+                }
+
+                try
+                {
+                    if (!int.TryParse(txtSrPort.Text.Trim(), out int port))
+                        throw new FormatException("포트 값이 올바르지 않습니다: " + txtSrPort.Text);
+
+                    _smartRay.Connect(txtSrIp.Text.Trim(), port, 3000);
+                    LogSafe("[자동연결] SmartRay 연결 성공: " + txtSrIp.Text.Trim());
+                }
+                catch (Exception ex)
+                {
+                    LogSafe(string.Format("[자동연결] SmartRay 연결 실패 ({0}): {1}", ex.GetType().Name, ex.Message));
+                }
+
+                Invoke(new Action(UpdateConnectionStatusLabels));
+            });
+        }
+
+        // "연동 테스트" 탭에서 두 장비가 지금 연결되어 있는지 한눈에 보이도록 텍스트로 표시한다.
+        private void UpdateConnectionStatusLabels()
+        {
+            lblAcsStatus.Text = "ACS: " + (_acs.IsConnected ? "연결됨" : "연결 안됨");
+            lblAcsStatus.ForeColor = _acs.IsConnected ? Color.SeaGreen : Color.Firebrick;
+
+            lblSmartRayStatus.Text = "SmartRay: " + (_smartRay.IsConnected ? "연결됨" : "연결 안됨");
+            lblSmartRayStatus.ForeColor = _smartRay.IsConnected ? Color.SeaGreen : Color.Firebrick;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -38,6 +81,8 @@ namespace _3DVision
             {
                 Log("연결 실패 (ACSException): " + ex.Message);
             }
+
+            UpdateConnectionStatusLabels();
         }
 
         private void btnDisconnect_Click(object sender, EventArgs e)
@@ -51,6 +96,8 @@ namespace _3DVision
             {
                 Log("연결 해제 실패: " + ex.Message);
             }
+
+            UpdateConnectionStatusLabels();
         }
 
         private void btnCheckStatus_Click(object sender, EventArgs e)
@@ -220,12 +267,15 @@ namespace _3DVision
             {
                 Log("IP 주소 형식이 올바르지 않습니다: " + txtSrIp.Text);
             }
+
+            UpdateConnectionStatusLabels();
         }
 
         private void btnSrDisconnect_Click(object sender, EventArgs e)
         {
             _smartRay.Disconnect();
             Log("SmartRay 연결을 해제했습니다.");
+            UpdateConnectionStatusLabels();
         }
 
         private void btnSrInfo_Click(object sender, EventArgs e)
@@ -340,80 +390,153 @@ namespace _3DVision
             return (total, valid, minX, maxX, minY, maxY, minZ, maxZ);
         }
 
-        // 백그라운드 스레드에서 호출된다. 비트맵을 만든 뒤 UI 스레드로 넘겨서 PictureBox에 표시한다.
-        private void ShowHeightMap(Point3F[] points)
+        // ZMap의 raw 값(UInt16)을 분석한다. 0은 "측정 안 됨"으로 취급한다 (실제 mm 단위 변환 전 raw 값 기준).
+        private static (int total, int valid, int minRaw, int maxRaw) AnalyzeZMap(ZMapResult result)
         {
-            var bitmap = BuildHeightMapImage(points, picHeightMap.Width, picHeightMap.Height);
+            int total = result.ZData?.Length ?? 0;
+            int valid = 0;
+            int minRaw = int.MaxValue, maxRaw = int.MinValue;
+
+            if (result.ZData != null)
+            {
+                foreach (var v in result.ZData)
+                {
+                    if (v == 0)
+                        continue;
+
+                    valid++;
+                    if (v < minRaw) minRaw = v;
+                    if (v > maxRaw) maxRaw = v;
+                }
+            }
+
+            if (valid == 0)
+            {
+                minRaw = 0;
+                maxRaw = 0;
+            }
+
+            return (total, valid, minRaw, maxRaw);
+        }
+
+        // 백그라운드 스레드에서 호출된다. 비트맵을 만든 뒤 UI 스레드로 넘겨서 PictureBox에 표시한다.
+        // 높이맵(위에서 본 그레이스케일)과 포인트클라우드(등각 투영, 의사 3D)를 같이 갱신한다.
+        private void ShowZMapImage(ZMapResult result)
+        {
+            var heightMapBitmap = BuildZMapImage(result);
+            var pointCloudBitmap = BuildPointCloudImage(result, picPointCloud.Width, picPointCloud.Height);
 
             Invoke(new Action(() =>
             {
                 picHeightMap.Image?.Dispose();
-                picHeightMap.Image = bitmap;
+                picHeightMap.Image = heightMapBitmap;
+
+                picPointCloud.Image?.Dispose();
+                picPointCloud.Image = pointCloudBitmap;
             }));
         }
 
-        // 포인트들을 X(가로)/Y(세로) 범위에 맞춰 격자에 흩뿌리고, Z값을 그레이스케일로 매핑한 높이맵 이미지를 만든다.
-        // SmartRay PointCloud는 SmartRay 자체적으로 고정된 사각 격자 구조가 아니라서, 값 범위 기준으로 직접 격자를 만든다.
-        private static Bitmap BuildHeightMapImage(Point3F[] points, int imageWidth, int imageHeight)
+        // ZMap 격자를 열(col)/행(row)/높이(z) 기준으로 간단한 등각(isometric) 투영해 흩뿌린다.
+        // 진짜 3D 뷰어(회전/줌)는 아니지만, 위에서만 보는 높이맵과 달리 입체감을 볼 수 있다.
+        // 참고: row(행) 방향은 실제 mm 거리가 아니라 촬영 순서 기준이라 세로 비율은 정확하지 않다.
+        private static Bitmap BuildPointCloudImage(ZMapResult result, int imageWidth, int imageHeight)
         {
-            const float InvalidThreshold = -999990f;
-
             var bitmap = new Bitmap(Math.Max(1, imageWidth), Math.Max(1, imageHeight));
             using (var g = Graphics.FromImage(bitmap))
                 g.Clear(Color.Black);
 
-            float minX = float.MaxValue, maxX = float.MinValue;
-            float minY = float.MaxValue, maxY = float.MinValue;
-            float minZ = float.MaxValue, maxZ = float.MinValue;
-
-            foreach (var p in points)
-            {
-                if (float.IsNaN(p.X) || float.IsNaN(p.Y) || float.IsNaN(p.Z))
-                    continue;
-                if (p.X < InvalidThreshold || p.Y < InvalidThreshold || p.Z < InvalidThreshold)
-                    continue;
-
-                if (p.X < minX) minX = p.X;
-                if (p.X > maxX) maxX = p.X;
-                if (p.Y < minY) minY = p.Y;
-                if (p.Y > maxY) maxY = p.Y;
-                if (p.Z < minZ) minZ = p.Z;
-                if (p.Z > maxZ) maxZ = p.Z;
-            }
-
-            if (maxX <= minX || maxY <= minY)
+            if (result.ZData == null || result.ZData.Length < result.Width * result.Height)
                 return bitmap;
 
-            float zRange = maxZ - minZ;
-            if (zRange <= 0)
-                zRange = 1;
-
-            int w = bitmap.Width;
-            int h = bitmap.Height;
-            var grid = new float?[w, h];
-
-            foreach (var p in points)
+            ushort minRaw = ushort.MaxValue, maxRaw = 0;
+            foreach (var v in result.ZData)
             {
-                if (float.IsNaN(p.X) || float.IsNaN(p.Y) || float.IsNaN(p.Z))
+                if (v == 0)
                     continue;
-                if (p.X < InvalidThreshold || p.Y < InvalidThreshold || p.Z < InvalidThreshold)
-                    continue;
-
-                int px = (int)((p.X - minX) / (maxX - minX) * (w - 1));
-                int py = (int)((p.Y - minY) / (maxY - minY) * (h - 1));
-                py = h - 1 - py; // 이미지 좌표는 위가 0이므로 뒤집는다.
-
-                grid[px, py] = p.Z;
+                if (v < minRaw) minRaw = v;
+                if (v > maxRaw) maxRaw = v;
             }
 
-            for (int x = 0; x < w; x++)
+            if (maxRaw <= minRaw)
+                return bitmap;
+
+            float zRange = maxRaw - minRaw;
+            int w = result.Width;
+            int h = result.Height;
+
+            const double AngleDeg = 30.0;
+            double cos = Math.Cos(AngleDeg * Math.PI / 180.0);
+            double sin = Math.Sin(AngleDeg * Math.PI / 180.0);
+
+            double spanX = (w + h) * cos;
+            double scaleXY = spanX > 0 ? (bitmap.Width * 0.9) / spanX : 1.0;
+            double heightScale = bitmap.Height * 0.5;
+            double originX = bitmap.Width / 2.0;
+            double originY = bitmap.Height * 0.8;
+
+            for (int row = 0; row < h; row++)
             {
-                for (int y = 0; y < h; y++)
+                for (int col = 0; col < w; col++)
                 {
-                    if (!grid[x, y].HasValue)
+                    ushort v = result.ZData[row * w + col];
+                    if (v == 0)
                         continue;
 
-                    int gray = (int)((grid[x, y].Value - minZ) / zRange * 255);
+                    float zNorm = (v - minRaw) / zRange;
+
+                    double sx = originX + (col - row) * cos * scaleXY;
+                    double sy = originY - (col + row) * sin * scaleXY * 0.5 - zNorm * heightScale;
+
+                    int px = (int)sx;
+                    int py = (int)sy;
+                    if (px < 0 || px >= bitmap.Width || py < 0 || py >= bitmap.Height)
+                        continue;
+
+                    int gray = (int)(60 + zNorm * 195);
+                    gray = Math.Max(0, Math.Min(255, gray));
+                    bitmap.SetPixel(px, py, Color.FromArgb(gray, gray, 255));
+                }
+            }
+
+            return bitmap;
+        }
+
+        // ZMap은 이미 Width x Height 격자로 정렬되어 있으므로, 흩뿌릴 필요 없이 그대로 그레이스케일로 매핑한다.
+        private static Bitmap BuildZMapImage(ZMapResult result)
+        {
+            int w = Math.Max(1, result.Width);
+            int h = Math.Max(1, result.Height);
+            var bitmap = new Bitmap(w, h);
+
+            using (var g = Graphics.FromImage(bitmap))
+                g.Clear(Color.Black);
+
+            if (result.ZData == null || result.ZData.Length < result.Width * result.Height)
+                return bitmap;
+
+            ushort minRaw = ushort.MaxValue, maxRaw = 0;
+            foreach (var v in result.ZData)
+            {
+                if (v == 0)
+                    continue;
+                if (v < minRaw) minRaw = v;
+                if (v > maxRaw) maxRaw = v;
+            }
+
+            if (maxRaw <= minRaw)
+                return bitmap;
+
+            float range = maxRaw - minRaw;
+
+            for (int y = 0; y < result.Height; y++)
+            {
+                for (int x = 0; x < result.Width; x++)
+                {
+                    ushort v = result.ZData[y * result.Width + x];
+                    if (v == 0)
+                        continue;
+
+                    int gray = (int)((v - minRaw) / range * 255);
                     gray = Math.Max(0, Math.Min(255, gray));
                     bitmap.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
                 }
@@ -451,6 +574,9 @@ namespace _3DVision
             }
         }
 
+        // 이동하는 내내 레이저가 켜져 있도록, 이동 시간보다 넉넉하게 걸릴 만큼 큰 프로파일 수를 요청한다.
+        private const int ScanGrabProfileCount = 5000;
+
         // 자재 끝 위치는 실측으로 확인된 고정값이라 UI에서 입력받지 않는다.
         private const double ScanEndPosition = 130.221;
 
@@ -462,12 +588,6 @@ namespace _3DVision
                 return;
             }
 
-            if (!double.TryParse(txtTransportRes.Text.Trim(), out double transportResUm) || transportResUm <= 0)
-            {
-                Log("Transport Resolution 값이 올바르지 않습니다: " + txtTransportRes.Text);
-                return;
-            }
-
             if (startPos == ScanEndPosition)
             {
                 Log("시작 위치와 끝 위치가 같습니다.");
@@ -476,24 +596,19 @@ namespace _3DVision
 
             int axisIndex = (int)numMoveAxis.Value;
 
-            _sweepCts = new CancellationTokenSource();
-            CancellationToken token = _sweepCts.Token;
-
             SetContinuousScanRunningState(true);
 
-            Task.Run(() => RunContinuousScan(axisIndex, startPos, ScanEndPosition, transportResUm, token))
+            Task.Run(() => RunMoveAndGrab(axisIndex, startPos, ScanEndPosition))
                 .ContinueWith(t => Invoke(new Action(() => SetContinuousScanRunningState(false))));
         }
 
         private void btnScanStop_Click(object sender, EventArgs e)
         {
-            _sweepCts?.Cancel();
-
             // 이동 중일 수 있으므로 즉시 정지시키고, 레이저도 반드시 끈다.
             int axisIndex = (int)numMoveAxis.Value;
             _acs.Stop(axisIndex);
-            _smartRay.StopContinuousScan();
-            Log("[연속 스캔] 비상 중지: 모터 정지 + 레이저 OFF");
+            _smartRay.StopZMapCapture();
+            Log("[이동+촬영] 비상 정지: 모터 정지 + 레이저 OFF");
         }
 
         private void SetContinuousScanRunningState(bool running)
@@ -506,71 +621,60 @@ namespace _3DVision
         }
 
         // 백그라운드 스레드에서 실행된다. UI 컨트롤은 절대 직접 건드리지 말고 LogSafe로만 로그를 남긴다.
-        // 순서가 중요하다: SmartRay를 먼저 트리거 대기 상태로 만들고(ArmContinuousScan), 그 다음에 ACS를 끝 위치까지 이동시켜야
-        // 이동 시작 구간의 데이터를 놓치지 않는다.
-        private void RunContinuousScan(int axisIndex, double startPos, double endPos, double transportResUm, CancellationToken token)
+        // 순서가 중요하다: 시작 위치로 이동(레이저 꺼짐) → SmartRay를 먼저 촬영 대기 상태로 만들어 레이저를 켠 뒤 →
+        // 그 상태로 끝 위치까지 이동한다. 그래야 이동하는 내내 레이저가 켜진 채로 촬영된다.
+        private void RunMoveAndGrab(int axisIndex, double startPos, double endPos)
         {
-            double transportResMm = transportResUm / 1000.0;
-            int profileCount = (int)Math.Ceiling(Math.Abs(endPos - startPos) / transportResMm) + 10; // 약간의 여유분
-
-            LogSafe(string.Format("[연속 스캔] {0:0.###} → {1:0.###}, Transport Res {2}um, 예상 {3}프로파일",
-                startPos, endPos, transportResUm, profileCount));
-
             try
             {
-                LogSafe(string.Format("[연속 스캔] 시작 위치({0:0.###})로 이동합니다...", startPos));
+                LogSafe(string.Format("[이동+촬영] 시작 위치({0:0.###})로 이동합니다...", startPos));
                 _acs.MoveAbsolute(axisIndex, startPos);
                 if (!_acs.WaitForInPosition(axisIndex, 30000))
                 {
-                    LogSafe("[연속 스캔] 시작 위치 이동이 시간 안에 끝나지 않아 중단합니다.");
+                    LogSafe("[이동+촬영] 시작 위치 이동이 시간 안에 끝나지 않아 중단합니다.");
                     return;
                 }
 
-                if (token.IsCancellationRequested)
-                {
-                    LogSafe("[연속 스캔] 중지되었습니다.");
-                    return;
-                }
-
-                LogSafe("[연속 스캔] SmartRay를 외부 트리거 대기 상태로 설정합니다 (레이저 ON)...");
-                _smartRay.ArmContinuousScan(profileCount, transportResMm, step => LogSafe("  단계: " + step));
+                LogSafe("[이동+촬영] SmartRay 촬영을 시작합니다 (레이저 ON)...");
+                _smartRay.ArmZMapCapture(ScanGrabProfileCount, step => LogSafe("  단계: " + step));
 
                 try
                 {
-                    LogSafe(string.Format("[연속 스캔] ACS를 끝 위치({0:0.###})까지 이동합니다...", endPos));
+                    LogSafe(string.Format("[이동+촬영] 레이저를 켠 채로 끝 위치({0:0.###})까지 이동합니다...", endPos));
                     _acs.MoveAbsolute(axisIndex, endPos);
 
                     bool moveDone = _acs.WaitForInPosition(axisIndex, 180000);
+                    double actualPos = _acs.GetAxisPosition(axisIndex);
                     if (!moveDone)
-                        LogSafe("[연속 스캔] 경고: 이동이 제한 시간(180초) 안에 끝나지 않았습니다.");
-                    else
-                        LogSafe("[연속 스캔] 이동 완료. 남은 데이터 수신을 대기합니다...");
-
-                    var result = _smartRay.WaitForContinuousScan(10000);
-                    if (result == null)
                     {
-                        LogSafe("[연속 스캔] 데이터를 받지 못했습니다 (타임아웃).");
+                        LogSafe(string.Format("[이동+촬영] 경고: 이동이 제한 시간(180초) 안에 끝나지 않았습니다. 현재 위치: {0:0.###}", actualPos));
                         return;
                     }
 
-                    var s = AnalyzePoints(result.Points);
-                    LogSafe(string.Format("[연속 스캔] 완료: 전체 {0}점 중 유효 {1}점", s.total, s.valid));
-                    if (s.valid > 0)
-                    {
-                        LogSafe(string.Format("[연속 스캔] 범위 - X:[{0:0.###}, {1:0.###}] Y:[{2:0.###}, {3:0.###}] Z:[{4:0.###}, {5:0.###}] (Y는 Input1 트리거 특성이 검증되지 않아 부정확할 수 있음)",
-                            s.minX, s.maxX, s.minY, s.maxY, s.minZ, s.maxZ));
+                    LogSafe(string.Format("[이동+촬영] 이동 완료. 실제 위치: {0:0.###}. 남은 촬영 데이터를 대기합니다...", actualPos));
 
-                        ShowHeightMap(result.Points);
+                    var result = _smartRay.WaitForZMapCapture(15000);
+                    if (result == null)
+                    {
+                        LogSafe("[이동+촬영] 촬영 데이터를 받지 못했습니다 (타임아웃).");
+                        return;
                     }
+
+                    var s = AnalyzeZMap(result);
+                    LogSafe(string.Format("[이동+촬영] 완료: {0}x{1}, 전체 {2}점 중 유효 {3}점, raw Z:[{4}, {5}]",
+                        result.Width, result.Height, s.total, s.valid, s.minRaw, s.maxRaw));
+
+                    if (s.valid > 0)
+                        ShowZMapImage(result);
                 }
                 finally
                 {
-                    _smartRay.StopContinuousScan();
+                    _smartRay.StopZMapCapture();
                 }
             }
-            catch (Exception ex) when (ex is COMException || ex is ACSException || ex is SmartRayApiException || ex is InvalidOperationException)
+            catch (Exception ex)
             {
-                LogSafe("[연속 스캔] 오류 발생: " + ex.Message);
+                LogSafe(string.Format("[이동+촬영] 오류 발생 ({0}): {1}", ex.GetType().Name, ex.Message));
             }
         }
 
@@ -584,7 +688,6 @@ namespace _3DVision
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _sweepCts?.Cancel();
             _acs.Dispose();
             _smartRay.Dispose();
         }

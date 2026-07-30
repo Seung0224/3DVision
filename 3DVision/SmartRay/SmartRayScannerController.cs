@@ -12,20 +12,28 @@ namespace _3DVision.SmartRay
         public uint Height;
     }
 
+    // ZMap 방식으로 받은 원본 데이터. zData는 보정 전 raw 값(0 = 무효)이며, 실제 mm 단위 변환은 하지 않는다.
+    public class ZMapResult
+    {
+        public int Width;
+        public int Height;
+        public ushort[] ZData;
+    }
+
     // SmartRay ECCO 스캐너와의 통신을 담당하는 클래스.
     // 2단계-A: SDK 초기화, 장치 검색(Discovery), 연결/해제, 레이저/촬영 없는 장비 정보 조회.
-    // 2단계-B: 레이저를 켜고 한 번 스냅샷을 찍어 포인트클라우드를 받아오는 단일 그랩(FreeRunning).
-    // 3단계: ACS 축의 외부 트리거(Input1)에 맞춰 자동으로 프로파일을 쌓는 연속 스캔.
+    // 2단계-B: 레이저를 켜고 단일 스냅샷을 촬영한다 (FreeRunning, 트리거 없이 즉시 촬영).
+    //   - PointCloud 방식(GrabSingle)과 ZMap 방식(GrabZMap) 둘 다 지원한다.
     public class SmartRayScannerController : IDisposable
     {
         private static bool _apiInitialized;
 
         private Sensor _sensor;
-        private bool _baseConfigured;
+        private bool _calibrationLoaded;
 
-        private ManualResetEventSlim _scanDone;
-        private GrabResult _scanResult;
-        private Sensor.OnPointCloudImageDelegate _scanHandler;
+        private ManualResetEventSlim _zmapDone;
+        private ZMapResult _zmapResult;
+        private Sensor.OnZilImageDelegate _zmapHandler;
 
         public bool IsConnected => _sensor != null && _sensor.IsConnectionEstablished;
 
@@ -71,7 +79,7 @@ namespace _3DVision.SmartRay
             _sensor.Disconnect();
             _sensor.Dispose();
             _sensor = null;
-            _baseConfigured = false;
+            _calibrationLoaded = false;
         }
 
         // 레이저/촬영과 무관한, 연결 확인용 장비 정보만 읽어온다.
@@ -83,19 +91,12 @@ namespace _3DVision.SmartRay
             return (_sensor.ModelName, _sensor.SerialNumber, _sensor.FirmwareVersion);
         }
 
-        // 연결 후 한 번만 필요한 설정(획득 타입/캘리브레이션 로드)을 수행한다.
         // 캘리브레이션 로드는 네트워크 왕복이 있어 매번 반복하면 느려지므로, 연결이 끊기기 전까지는 한 번만 실행한다.
-        // 트리거 모드는 용도(단발 촬영 vs 연속 스캔)에 따라 매번 달라지므로 여기 포함하지 않는다.
-        private void EnsureBaseConfigured(Action<string> log)
+        // 촬영 타입(PointCloud/ZMap)은 그랩마다 다를 수 있어 각 그랩 메서드에서 매번 명시적으로 설정한다.
+        private void EnsureCalibrationLoaded(Action<string> log)
         {
-            if (_baseConfigured)
+            if (_calibrationLoaded)
                 return;
-
-            log?.Invoke("SetImageAcquisitionType(PointCloud)");
-            _sensor.SetImageAcquisitionType(ImageAcquisitionType.PointCloud);
-
-            log?.Invoke("SetAcquisitionImageTypeFlags(PointCloudP)");
-            _sensor.SetAcquisitionImageTypeFlags(AcquisitionImageTypeFlags.PointCloudP);
 
             log?.Invoke("IsCalibrationDataAvailableOnSensor");
             if (_sensor.IsCalibrationDataAvailableOnSensor())
@@ -108,7 +109,7 @@ namespace _3DVision.SmartRay
                 log?.Invoke("경고: 센서에 캘리브레이션 데이터가 없습니다.");
             }
 
-            _baseConfigured = true;
+            _calibrationLoaded = true;
         }
 
         // 레이저를 켜고 단일 스냅샷을 촬영해 포인트클라우드를 받아온다. (모터 동기화 없이 소프트웨어 명령만으로 즉시 촬영)
@@ -131,7 +132,13 @@ namespace _3DVision.SmartRay
             _sensor.OnPointCloudImage += handler;
             try
             {
-                EnsureBaseConfigured(log);
+                log?.Invoke("SetImageAcquisitionType(PointCloud)");
+                _sensor.SetImageAcquisitionType(ImageAcquisitionType.PointCloud);
+
+                log?.Invoke("SetAcquisitionImageTypeFlags(PointCloudP)");
+                _sensor.SetAcquisitionImageTypeFlags(AcquisitionImageTypeFlags.PointCloudP);
+
+                EnsureCalibrationLoaded(log);
 
                 log?.Invoke("SetStartTrigger(None)");
                 _sensor.SetStartTrigger(StartTriggerSource.None, false, TriggerEdgeMode.RisingEdge);
@@ -170,28 +177,29 @@ namespace _3DVision.SmartRay
             return result;
         }
 
-        // ACS 축의 외부 신호(Input1)에 맞춰 자동으로 프로파일을 찍는 연속 스캔을 무장(arm)한다.
-        // 레이저를 켜고 StartAcquisition까지 호출한 뒤, 트리거를 기다리는 상태로 즉시 반환한다.
-        // 반드시 이 호출이 끝난 "이후에" ACS 이동 명령을 내려야 스캔 시작 구간을 놓치지 않는다.
-        public void ArmContinuousScan(int profileCount, double transportResolutionMm, Action<string> log = null)
+        // 레이저를 켜고 ZMap 촬영 대기 상태로 만든 뒤 즉시 반환한다 (블로킹하지 않음).
+        // 호출 직후 ACS 이동을 시작하면 "이동하는 내내 레이저가 켜져 있는" 상태로 촬영할 수 있다.
+        // 반드시 WaitForZMapCapture로 결과를 받고, 성공/실패와 관계없이 StopZMapCapture를 호출해야 한다.
+        public void ArmZMapCapture(int profileCount, Action<string> log = null)
         {
             if (!IsConnected)
                 throw new InvalidOperationException("스캐너에 연결되어 있지 않습니다.");
 
-            EnsureBaseConfigured(log);
+            log?.Invoke("SetImageAcquisitionType(ZMapIntensityLaserLineThickness)");
+            _sensor.SetImageAcquisitionType(ImageAcquisitionType.ZMapIntensityLaserLineThickness);
 
-            log?.Invoke("SetDataTriggerMode(External)");
-            _sensor.SetDataTriggerMode(DataTriggerMode.External);
+            EnsureCalibrationLoaded(log);
 
-            log?.Invoke("SetDataTriggerExternalTriggerSource(Input1)");
-            _sensor.SetDataTriggerExternalTriggerSource(DataTriggerSource.Input1);
+            // ZMap은 PointCloud와 달리 ROI가 좁게(또는 안 맞게) 남아있으면 데이터를 전혀 못 만든다.
+            // Jastech도 Live/그랩 시작 전에 항상 센서 전체 범위로 ROI를 명시적으로 맞춘다.
+            log?.Invoke(string.Format("SetROI(0, {0}, 0, {1})", _sensor.MaxDimensions.Width, _sensor.MaxDimensions.Height));
+            _sensor.SetROI(0, (int)_sensor.MaxDimensions.Width, 0, (int)_sensor.MaxDimensions.Height);
 
-            log?.Invoke("SetDataTriggerExternalTriggerParameters(divider=1)");
-            _sensor.SetDataTriggerExternalTriggerParameters(1, 0, TriggerEdgeMode.Both);
+            log?.Invoke("SetStartTrigger(None)");
+            _sensor.SetStartTrigger(StartTriggerSource.None, false, TriggerEdgeMode.RisingEdge);
 
-            // SDK 내부 단위는 meter이므로 mm 입력값을 1000으로 나눈다.
-            log?.Invoke(string.Format("SetTransportResolution({0}mm)", transportResolutionMm));
-            _sensor.SetTransportResolution((float)(transportResolutionMm / 1000.0));
+            log?.Invoke("SetDataTriggerMode(FreeRunning)");
+            _sensor.SetDataTriggerMode(DataTriggerMode.FreeRunning);
 
             log?.Invoke("SetAcquisitionMode(Snapshot)");
             _sensor.SetAcquisitionMode(AcquisitionMode.Snapshot);
@@ -199,35 +207,35 @@ namespace _3DVision.SmartRay
             log?.Invoke("SetNumberOfProfilesToCapture");
             _sensor.SetNumberOfProfilesToCapture((uint)profileCount);
 
-            _scanDone = new ManualResetEventSlim(false);
-            _scanResult = null;
+            _zmapDone = new ManualResetEventSlim(false);
+            _zmapResult = null;
 
-            _scanHandler = (sensor, dataType, width, height, points, intensity, reflectance, metaData) =>
+            _zmapHandler = (sensor, dataType, height, width, verticalRes, horizontalRes, zData, intensityData, laserLineData, originY) =>
             {
-                _scanResult = new GrabResult { Points = points, Width = width, Height = height };
-                _scanDone.Set();
+                _zmapResult = new ZMapResult { Width = width, Height = height, ZData = zData };
+                _zmapDone.Set();
             };
-            _sensor.OnPointCloudImage += _scanHandler;
+            _sensor.OnZilImage += _zmapHandler;
 
             log?.Invoke("SetLaserPower(true)");
             _sensor.SetLaserPower(true);
 
-            log?.Invoke("StartAcquisition (외부 트리거 대기 시작)");
+            log?.Invoke("StartAcquisition (레이저 ON, 이동 중 계속 촬영)");
             _sensor.StartAcquisition();
         }
 
-        // ArmContinuousScan 이후 호출. 요청한 프로파일 수만큼 데이터가 다 모일 때까지 대기한다.
-        // 시간 안에 못 받으면 null을 반환한다 (예외를 던지지 않음 - 호출자가 StopContinuousScan을 반드시 부르게 하기 위함).
-        public GrabResult WaitForContinuousScan(int timeoutMilliseconds)
+        // ArmZMapCapture 이후 호출. 요청한 프로파일 수만큼 데이터가 다 모일 때까지 대기한다.
+        // 시간 안에 못 받으면 null을 반환한다 (예외를 던지지 않음 - 호출자가 StopZMapCapture를 반드시 부르게 하기 위함).
+        public ZMapResult WaitForZMapCapture(int timeoutMilliseconds)
         {
-            if (_scanDone == null)
-                throw new InvalidOperationException("ArmContinuousScan을 먼저 호출해야 합니다.");
+            if (_zmapDone == null)
+                throw new InvalidOperationException("ArmZMapCapture를 먼저 호출해야 합니다.");
 
-            return _scanDone.Wait(timeoutMilliseconds) ? _scanResult : null;
+            return _zmapDone.Wait(timeoutMilliseconds) ? _zmapResult : null;
         }
 
         // 레이저를 끄고 촬영을 정지한다. Arm 이후에는 성공/실패/타임아웃 여부와 관계없이 항상 호출해야 한다.
-        public void StopContinuousScan()
+        public void StopZMapCapture()
         {
             if (_sensor == null)
                 return;
@@ -235,10 +243,10 @@ namespace _3DVision.SmartRay
             _sensor.SetLaserPower(false);
             _sensor.StopAcquisition();
 
-            if (_scanHandler != null)
+            if (_zmapHandler != null)
             {
-                _sensor.OnPointCloudImage -= _scanHandler;
-                _scanHandler = null;
+                _sensor.OnZilImage -= _zmapHandler;
+                _zmapHandler = null;
             }
         }
 
