@@ -28,150 +28,94 @@ namespace _3DVision
         /// </summary>
         private void InitializeComponent()
         {
-            this.tabMain = new System.Windows.Forms.TabControl();
-            this.tabPageAcs = new System.Windows.Forms.TabPage();
             this.grpAcs = new System.Windows.Forms.GroupBox();
-            this.lblAxis = new System.Windows.Forms.Label();
-            this.numAxis = new System.Windows.Forms.NumericUpDown();
-            this.btnCheckStatus = new System.Windows.Forms.Button();
+            this.btnJogPlus = new System.Windows.Forms.Button();
+            this.btnJogMinus = new System.Windows.Forms.Button();
+            this.txtJogStep = new System.Windows.Forms.TextBox();
+            this.lblJogStep = new System.Windows.Forms.Label();
+            this.lblAcsStatus = new System.Windows.Forms.Label();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.txtIp = new System.Windows.Forms.TextBox();
             this.lblIp = new System.Windows.Forms.Label();
-            this.grpMove = new System.Windows.Forms.GroupBox();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.btnMovePlus = new System.Windows.Forms.Button();
-            this.btnMoveMinus = new System.Windows.Forms.Button();
-            this.txtDistance = new System.Windows.Forms.TextBox();
-            this.lblDistance = new System.Windows.Forms.Label();
-            this.btnDisable = new System.Windows.Forms.Button();
-            this.btnEnable = new System.Windows.Forms.Button();
-            this.numMoveAxis = new System.Windows.Forms.NumericUpDown();
-            this.lblMoveAxis = new System.Windows.Forms.Label();
-            this.tabPageSmartRay = new System.Windows.Forms.TabPage();
             this.grpSmartRay = new System.Windows.Forms.GroupBox();
-            this.btnSrInfo = new System.Windows.Forms.Button();
+            this.lblSmartRayStatus = new System.Windows.Forms.Label();
             this.btnSrDisconnect = new System.Windows.Forms.Button();
             this.btnSrConnect = new System.Windows.Forms.Button();
             this.txtSrPort = new System.Windows.Forms.TextBox();
             this.lblSrPort = new System.Windows.Forms.Label();
             this.txtSrIp = new System.Windows.Forms.TextBox();
             this.lblSrIp = new System.Windows.Forms.Label();
-            this.cmbSensors = new System.Windows.Forms.ComboBox();
-            this.btnDiscover = new System.Windows.Forms.Button();
-            this.grpGrab = new System.Windows.Forms.GroupBox();
-            this.btnGrab = new System.Windows.Forms.Button();
-            this.txtProfileCount = new System.Windows.Forms.TextBox();
-            this.lblProfileCount = new System.Windows.Forms.Label();
-            this.tabPageIntegration = new System.Windows.Forms.TabPage();
-            this.grpContinuousScan = new System.Windows.Forms.GroupBox();
+            this.grpControl = new System.Windows.Forms.GroupBox();
             this.btnScanStop = new System.Windows.Forms.Button();
             this.btnScanStart = new System.Windows.Forms.Button();
+            this.btnHome = new System.Windows.Forms.Button();
+            this.numMoveAxis = new System.Windows.Forms.NumericUpDown();
+            this.lblMoveAxis = new System.Windows.Forms.Label();
             this.txtStartPos = new System.Windows.Forms.TextBox();
             this.lblStartPos = new System.Windows.Forms.Label();
-            this.btnHome = new System.Windows.Forms.Button();
-            this.lblAcsStatus = new System.Windows.Forms.Label();
-            this.lblSmartRayStatus = new System.Windows.Forms.Label();
-            this.picHeightMap = new System.Windows.Forms.PictureBox();
             this.lblHeightMap = new System.Windows.Forms.Label();
+            this.picHeightMap = new System.Windows.Forms.PictureBox();
+            this.lblIntensity = new System.Windows.Forms.Label();
+            this.picIntensity = new System.Windows.Forms.PictureBox();
+            this.lblLive = new System.Windows.Forms.Label();
+            this.btnLiveStart = new System.Windows.Forms.Button();
+            this.btnLiveStop = new System.Windows.Forms.Button();
+            this.lblRepeatStart = new System.Windows.Forms.Label();
+            this.txtRepeatStartPos = new System.Windows.Forms.TextBox();
+            this.lblRepeatEnd = new System.Windows.Forms.Label();
+            this.txtRepeatEndPos = new System.Windows.Forms.TextBox();
+            this.btnRepeat = new System.Windows.Forms.Button();
+            this.picLiveImage = new System.Windows.Forms.PictureBox();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
-            this.tabMain.SuspendLayout();
-            this.tabPageAcs.SuspendLayout();
             this.grpAcs.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numAxis)).BeginInit();
-            this.grpMove.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).BeginInit();
-            this.tabPageSmartRay.SuspendLayout();
             this.grpSmartRay.SuspendLayout();
-            this.grpGrab.SuspendLayout();
-            this.tabPageIntegration.SuspendLayout();
-            this.grpContinuousScan.SuspendLayout();
+            this.grpControl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picIntensity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picLiveImage)).BeginInit();
             this.SuspendLayout();
-            //
-            // tabMain
-            //
-            this.tabMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabMain.Controls.Add(this.tabPageIntegration);
-            this.tabMain.Controls.Add(this.tabPageSmartRay);
-            this.tabMain.Controls.Add(this.tabPageAcs);
-            this.tabMain.Location = new System.Drawing.Point(12, 12);
-            this.tabMain.Name = "tabMain";
-            this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(976, 380);
-            this.tabMain.TabIndex = 0;
-            //
-            // tabPageAcs
-            //
-            this.tabPageAcs.Controls.Add(this.grpAcs);
-            this.tabPageAcs.Controls.Add(this.grpMove);
-            this.tabPageAcs.Location = new System.Drawing.Point(4, 22);
-            this.tabPageAcs.Name = "tabPageAcs";
-            this.tabPageAcs.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAcs.Size = new System.Drawing.Size(968, 354);
-            this.tabPageAcs.TabIndex = 1;
-            this.tabPageAcs.Text = "ACS 모터";
-            this.tabPageAcs.UseVisualStyleBackColor = true;
             //
             // grpAcs
             //
-            this.grpAcs.Controls.Add(this.lblAxis);
-            this.grpAcs.Controls.Add(this.numAxis);
-            this.grpAcs.Controls.Add(this.btnCheckStatus);
+            this.grpAcs.Controls.Add(this.btnJogPlus);
+            this.grpAcs.Controls.Add(this.btnJogMinus);
+            this.grpAcs.Controls.Add(this.txtJogStep);
+            this.grpAcs.Controls.Add(this.lblJogStep);
+            this.grpAcs.Controls.Add(this.lblAcsStatus);
             this.grpAcs.Controls.Add(this.btnDisconnect);
             this.grpAcs.Controls.Add(this.btnConnect);
             this.grpAcs.Controls.Add(this.txtIp);
             this.grpAcs.Controls.Add(this.lblIp);
-            this.grpAcs.Location = new System.Drawing.Point(6, 6);
+            this.grpAcs.Location = new System.Drawing.Point(12, 12);
             this.grpAcs.Name = "grpAcs";
-            this.grpAcs.Size = new System.Drawing.Size(448, 120);
+            this.grpAcs.Size = new System.Drawing.Size(340, 150);
             this.grpAcs.TabIndex = 0;
             this.grpAcs.TabStop = false;
-            this.grpAcs.Text = "1단계-A: 연결/상태 확인";
+            this.grpAcs.Text = "ACS 연결";
             //
-            // lblAxis
+            // lblIp
             //
-            this.lblAxis.AutoSize = true;
-            this.lblAxis.Location = new System.Drawing.Point(240, 30);
-            this.lblAxis.Name = "lblAxis";
-            this.lblAxis.Size = new System.Drawing.Size(78, 12);
-            this.lblAxis.TabIndex = 6;
-            this.lblAxis.Text = "축 번호(0=X)";
+            this.lblIp.AutoSize = true;
+            this.lblIp.Location = new System.Drawing.Point(10, 28);
+            this.lblIp.Name = "lblIp";
+            this.lblIp.Size = new System.Drawing.Size(74, 12);
+            this.lblIp.TabIndex = 0;
+            this.lblIp.Text = "컨트롤러 IP";
             //
-            // numAxis
+            // txtIp
             //
-            this.numAxis.Location = new System.Drawing.Point(330, 27);
-            this.numAxis.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
-            this.numAxis.Name = "numAxis";
-            this.numAxis.Size = new System.Drawing.Size(60, 21);
-            this.numAxis.TabIndex = 5;
-            //
-            // btnCheckStatus
-            //
-            this.btnCheckStatus.Location = new System.Drawing.Point(240, 65);
-            this.btnCheckStatus.Name = "btnCheckStatus";
-            this.btnCheckStatus.Size = new System.Drawing.Size(150, 30);
-            this.btnCheckStatus.TabIndex = 4;
-            this.btnCheckStatus.Text = "상태 확인 (읽기전용)";
-            this.btnCheckStatus.UseVisualStyleBackColor = true;
-            this.btnCheckStatus.Click += new System.EventHandler(this.btnCheckStatus_Click);
-            //
-            // btnDisconnect
-            //
-            this.btnDisconnect.Location = new System.Drawing.Point(120, 65);
-            this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(100, 30);
-            this.btnDisconnect.TabIndex = 3;
-            this.btnDisconnect.Text = "연결 해제";
-            this.btnDisconnect.UseVisualStyleBackColor = true;
-            this.btnDisconnect.Click += new System.EventHandler(this.btnDisconnect_Click);
+            this.txtIp.Location = new System.Drawing.Point(95, 25);
+            this.txtIp.Name = "txtIp";
+            this.txtIp.Size = new System.Drawing.Size(150, 21);
+            this.txtIp.TabIndex = 1;
+            this.txtIp.Text = "10.0.0.100";
             //
             // btnConnect
             //
-            this.btnConnect.Location = new System.Drawing.Point(10, 65);
+            this.btnConnect.Location = new System.Drawing.Point(10, 55);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(100, 30);
             this.btnConnect.TabIndex = 2;
@@ -179,310 +123,158 @@ namespace _3DVision
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             //
-            // txtIp
+            // btnDisconnect
             //
-            this.txtIp.Location = new System.Drawing.Point(90, 27);
-            this.txtIp.Name = "txtIp";
-            this.txtIp.Size = new System.Drawing.Size(130, 21);
-            this.txtIp.TabIndex = 1;
-            this.txtIp.Text = "10.0.0.100";
+            this.btnDisconnect.Location = new System.Drawing.Point(120, 55);
+            this.btnDisconnect.Name = "btnDisconnect";
+            this.btnDisconnect.Size = new System.Drawing.Size(100, 30);
+            this.btnDisconnect.TabIndex = 3;
+            this.btnDisconnect.Text = "연결 해제";
+            this.btnDisconnect.UseVisualStyleBackColor = true;
+            this.btnDisconnect.Click += new System.EventHandler(this.btnDisconnect_Click);
             //
-            // lblIp
+            // lblJogStep
             //
-            this.lblIp.AutoSize = true;
-            this.lblIp.Location = new System.Drawing.Point(10, 30);
-            this.lblIp.Name = "lblIp";
-            this.lblIp.Size = new System.Drawing.Size(74, 12);
-            this.lblIp.TabIndex = 0;
-            this.lblIp.Text = "컨트롤러 IP";
+            this.lblJogStep.AutoSize = true;
+            this.lblJogStep.Location = new System.Drawing.Point(10, 98);
+            this.lblJogStep.Name = "lblJogStep";
+            this.lblJogStep.Size = new System.Drawing.Size(76, 12);
+            this.lblJogStep.TabIndex = 4;
+            this.lblJogStep.Text = "이동 단위(mm)";
             //
-            // grpMove
+            // txtJogStep
             //
-            this.grpMove.Controls.Add(this.btnStop);
-            this.grpMove.Controls.Add(this.btnMovePlus);
-            this.grpMove.Controls.Add(this.btnMoveMinus);
-            this.grpMove.Controls.Add(this.txtDistance);
-            this.grpMove.Controls.Add(this.lblDistance);
-            this.grpMove.Controls.Add(this.btnDisable);
-            this.grpMove.Controls.Add(this.btnEnable);
-            this.grpMove.Controls.Add(this.numMoveAxis);
-            this.grpMove.Controls.Add(this.lblMoveAxis);
-            this.grpMove.Location = new System.Drawing.Point(6, 132);
-            this.grpMove.Name = "grpMove";
-            this.grpMove.Size = new System.Drawing.Size(448, 110);
-            this.grpMove.TabIndex = 1;
-            this.grpMove.TabStop = false;
-            this.grpMove.Text = "1단계-B: 이동 테스트 (실제로 모터가 움직입니다. 주의)";
+            this.txtJogStep.Location = new System.Drawing.Point(100, 95);
+            this.txtJogStep.Name = "txtJogStep";
+            this.txtJogStep.Size = new System.Drawing.Size(60, 21);
+            this.txtJogStep.TabIndex = 5;
+            this.txtJogStep.Text = "5";
             //
-            // btnStop
+            // btnJogMinus
             //
-            this.btnStop.BackColor = System.Drawing.Color.Firebrick;
-            this.btnStop.ForeColor = System.Drawing.Color.White;
-            this.btnStop.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold);
-            this.btnStop.Location = new System.Drawing.Point(290, 20);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(150, 65);
-            this.btnStop.TabIndex = 8;
-            this.btnStop.Text = "정지 (비상)";
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            this.btnJogMinus.Location = new System.Drawing.Point(170, 93);
+            this.btnJogMinus.Name = "btnJogMinus";
+            this.btnJogMinus.Size = new System.Drawing.Size(65, 26);
+            this.btnJogMinus.TabIndex = 6;
+            this.btnJogMinus.Text = "◀ -";
+            this.btnJogMinus.UseVisualStyleBackColor = true;
+            this.btnJogMinus.Click += new System.EventHandler(this.btnJogMinus_Click);
             //
-            // btnMovePlus
+            // btnJogPlus
             //
-            this.btnMovePlus.Location = new System.Drawing.Point(220, 55);
-            this.btnMovePlus.Name = "btnMovePlus";
-            this.btnMovePlus.Size = new System.Drawing.Size(60, 28);
-            this.btnMovePlus.TabIndex = 7;
-            this.btnMovePlus.Text = "이동+ ▶";
-            this.btnMovePlus.UseVisualStyleBackColor = true;
-            this.btnMovePlus.Click += new System.EventHandler(this.btnMovePlus_Click);
+            this.btnJogPlus.Location = new System.Drawing.Point(240, 93);
+            this.btnJogPlus.Name = "btnJogPlus";
+            this.btnJogPlus.Size = new System.Drawing.Size(65, 26);
+            this.btnJogPlus.TabIndex = 7;
+            this.btnJogPlus.Text = "+ ▶";
+            this.btnJogPlus.UseVisualStyleBackColor = true;
+            this.btnJogPlus.Click += new System.EventHandler(this.btnJogPlus_Click);
             //
-            // btnMoveMinus
+            // lblAcsStatus
             //
-            this.btnMoveMinus.Location = new System.Drawing.Point(150, 55);
-            this.btnMoveMinus.Name = "btnMoveMinus";
-            this.btnMoveMinus.Size = new System.Drawing.Size(60, 28);
-            this.btnMoveMinus.TabIndex = 6;
-            this.btnMoveMinus.Text = "◀ -이동";
-            this.btnMoveMinus.UseVisualStyleBackColor = true;
-            this.btnMoveMinus.Click += new System.EventHandler(this.btnMoveMinus_Click);
-            //
-            // txtDistance
-            //
-            this.txtDistance.Location = new System.Drawing.Point(80, 57);
-            this.txtDistance.Name = "txtDistance";
-            this.txtDistance.Size = new System.Drawing.Size(50, 21);
-            this.txtDistance.TabIndex = 5;
-            this.txtDistance.Text = "5";
-            //
-            // lblDistance
-            //
-            this.lblDistance.AutoSize = true;
-            this.lblDistance.Location = new System.Drawing.Point(10, 60);
-            this.lblDistance.Name = "lblDistance";
-            this.lblDistance.Size = new System.Drawing.Size(58, 12);
-            this.lblDistance.TabIndex = 4;
-            this.lblDistance.Text = "거리(mm)";
-            //
-            // btnDisable
-            //
-            this.btnDisable.Location = new System.Drawing.Point(220, 20);
-            this.btnDisable.Name = "btnDisable";
-            this.btnDisable.Size = new System.Drawing.Size(75, 28);
-            this.btnDisable.TabIndex = 3;
-            this.btnDisable.Text = "Disable";
-            this.btnDisable.UseVisualStyleBackColor = true;
-            this.btnDisable.Click += new System.EventHandler(this.btnDisable_Click);
-            //
-            // btnEnable
-            //
-            this.btnEnable.Location = new System.Drawing.Point(140, 20);
-            this.btnEnable.Name = "btnEnable";
-            this.btnEnable.Size = new System.Drawing.Size(75, 28);
-            this.btnEnable.TabIndex = 2;
-            this.btnEnable.Text = "Enable";
-            this.btnEnable.UseVisualStyleBackColor = true;
-            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
-            //
-            // numMoveAxis
-            //
-            this.numMoveAxis.Location = new System.Drawing.Point(80, 22);
-            this.numMoveAxis.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
-            this.numMoveAxis.Name = "numMoveAxis";
-            this.numMoveAxis.Size = new System.Drawing.Size(50, 21);
-            this.numMoveAxis.TabIndex = 1;
-            //
-            // lblMoveAxis
-            //
-            this.lblMoveAxis.AutoSize = true;
-            this.lblMoveAxis.Location = new System.Drawing.Point(10, 25);
-            this.lblMoveAxis.Name = "lblMoveAxis";
-            this.lblMoveAxis.Size = new System.Drawing.Size(58, 12);
-            this.lblMoveAxis.TabIndex = 0;
-            this.lblMoveAxis.Text = "이동할 축";
-            //
-            // tabPageSmartRay
-            //
-            this.tabPageSmartRay.Controls.Add(this.grpGrab);
-            this.tabPageSmartRay.Controls.Add(this.grpSmartRay);
-            this.tabPageSmartRay.Location = new System.Drawing.Point(4, 22);
-            this.tabPageSmartRay.Name = "tabPageSmartRay";
-            this.tabPageSmartRay.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageSmartRay.Size = new System.Drawing.Size(968, 354);
-            this.tabPageSmartRay.TabIndex = 0;
-            this.tabPageSmartRay.Text = "SmartRay 스캐너";
-            this.tabPageSmartRay.UseVisualStyleBackColor = true;
+            this.lblAcsStatus.AutoSize = true;
+            this.lblAcsStatus.ForeColor = System.Drawing.Color.Firebrick;
+            this.lblAcsStatus.Location = new System.Drawing.Point(10, 128);
+            this.lblAcsStatus.Name = "lblAcsStatus";
+            this.lblAcsStatus.Size = new System.Drawing.Size(60, 12);
+            this.lblAcsStatus.TabIndex = 8;
+            this.lblAcsStatus.Text = "ACS: -";
             //
             // grpSmartRay
             //
-            this.grpSmartRay.Controls.Add(this.btnSrInfo);
+            this.grpSmartRay.Controls.Add(this.lblSmartRayStatus);
             this.grpSmartRay.Controls.Add(this.btnSrDisconnect);
             this.grpSmartRay.Controls.Add(this.btnSrConnect);
             this.grpSmartRay.Controls.Add(this.txtSrPort);
             this.grpSmartRay.Controls.Add(this.lblSrPort);
             this.grpSmartRay.Controls.Add(this.txtSrIp);
             this.grpSmartRay.Controls.Add(this.lblSrIp);
-            this.grpSmartRay.Controls.Add(this.cmbSensors);
-            this.grpSmartRay.Controls.Add(this.btnDiscover);
-            this.grpSmartRay.Location = new System.Drawing.Point(6, 6);
+            this.grpSmartRay.Location = new System.Drawing.Point(12, 172);
             this.grpSmartRay.Name = "grpSmartRay";
-            this.grpSmartRay.Size = new System.Drawing.Size(448, 150);
-            this.grpSmartRay.TabIndex = 0;
+            this.grpSmartRay.Size = new System.Drawing.Size(340, 115);
+            this.grpSmartRay.TabIndex = 1;
             this.grpSmartRay.TabStop = false;
-            this.grpSmartRay.Text = "2단계-A: 검색/연결/정보 확인";
-            //
-            // btnDiscover
-            //
-            this.btnDiscover.Location = new System.Drawing.Point(10, 20);
-            this.btnDiscover.Name = "btnDiscover";
-            this.btnDiscover.Size = new System.Drawing.Size(100, 28);
-            this.btnDiscover.TabIndex = 0;
-            this.btnDiscover.Text = "장치 검색";
-            this.btnDiscover.UseVisualStyleBackColor = true;
-            this.btnDiscover.Click += new System.EventHandler(this.btnDiscover_Click);
-            //
-            // cmbSensors
-            //
-            this.cmbSensors.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbSensors.FormattingEnabled = true;
-            this.cmbSensors.Location = new System.Drawing.Point(120, 22);
-            this.cmbSensors.Name = "cmbSensors";
-            this.cmbSensors.Size = new System.Drawing.Size(318, 20);
-            this.cmbSensors.TabIndex = 1;
-            this.cmbSensors.SelectedIndexChanged += new System.EventHandler(this.cmbSensors_SelectedIndexChanged);
+            this.grpSmartRay.Text = "SmartRay 연결";
             //
             // lblSrIp
             //
             this.lblSrIp.AutoSize = true;
-            this.lblSrIp.Location = new System.Drawing.Point(10, 60);
+            this.lblSrIp.Location = new System.Drawing.Point(10, 28);
             this.lblSrIp.Name = "lblSrIp";
             this.lblSrIp.Size = new System.Drawing.Size(19, 12);
-            this.lblSrIp.TabIndex = 2;
+            this.lblSrIp.TabIndex = 0;
             this.lblSrIp.Text = "IP";
             //
             // txtSrIp
             //
-            this.txtSrIp.Location = new System.Drawing.Point(35, 57);
+            this.txtSrIp.Location = new System.Drawing.Point(35, 25);
             this.txtSrIp.Name = "txtSrIp";
-            this.txtSrIp.Size = new System.Drawing.Size(120, 21);
-            this.txtSrIp.TabIndex = 3;
+            this.txtSrIp.Size = new System.Drawing.Size(140, 21);
+            this.txtSrIp.TabIndex = 1;
             this.txtSrIp.Text = "192.168.111.200";
             //
             // lblSrPort
             //
             this.lblSrPort.AutoSize = true;
-            this.lblSrPort.Location = new System.Drawing.Point(165, 60);
+            this.lblSrPort.Location = new System.Drawing.Point(185, 28);
             this.lblSrPort.Name = "lblSrPort";
             this.lblSrPort.Size = new System.Drawing.Size(29, 12);
-            this.lblSrPort.TabIndex = 4;
+            this.lblSrPort.TabIndex = 2;
             this.lblSrPort.Text = "포트";
             //
             // txtSrPort
             //
-            this.txtSrPort.Location = new System.Drawing.Point(200, 57);
+            this.txtSrPort.Location = new System.Drawing.Point(220, 25);
             this.txtSrPort.Name = "txtSrPort";
             this.txtSrPort.Size = new System.Drawing.Size(50, 21);
-            this.txtSrPort.TabIndex = 5;
+            this.txtSrPort.TabIndex = 3;
             this.txtSrPort.Text = "40";
             //
             // btnSrConnect
             //
-            this.btnSrConnect.Location = new System.Drawing.Point(260, 55);
+            this.btnSrConnect.Location = new System.Drawing.Point(10, 55);
             this.btnSrConnect.Name = "btnSrConnect";
-            this.btnSrConnect.Size = new System.Drawing.Size(85, 26);
-            this.btnSrConnect.TabIndex = 6;
+            this.btnSrConnect.Size = new System.Drawing.Size(100, 30);
+            this.btnSrConnect.TabIndex = 4;
             this.btnSrConnect.Text = "연결";
             this.btnSrConnect.UseVisualStyleBackColor = true;
             this.btnSrConnect.Click += new System.EventHandler(this.btnSrConnect_Click);
             //
             // btnSrDisconnect
             //
-            this.btnSrDisconnect.Location = new System.Drawing.Point(350, 55);
+            this.btnSrDisconnect.Location = new System.Drawing.Point(120, 55);
             this.btnSrDisconnect.Name = "btnSrDisconnect";
-            this.btnSrDisconnect.Size = new System.Drawing.Size(95, 26);
-            this.btnSrDisconnect.TabIndex = 7;
+            this.btnSrDisconnect.Size = new System.Drawing.Size(100, 30);
+            this.btnSrDisconnect.TabIndex = 5;
             this.btnSrDisconnect.Text = "연결 해제";
             this.btnSrDisconnect.UseVisualStyleBackColor = true;
             this.btnSrDisconnect.Click += new System.EventHandler(this.btnSrDisconnect_Click);
             //
-            // btnSrInfo
+            // lblSmartRayStatus
             //
-            this.btnSrInfo.Location = new System.Drawing.Point(10, 95);
-            this.btnSrInfo.Name = "btnSrInfo";
-            this.btnSrInfo.Size = new System.Drawing.Size(200, 30);
-            this.btnSrInfo.TabIndex = 8;
-            this.btnSrInfo.Text = "정보 확인 (읽기전용)";
-            this.btnSrInfo.UseVisualStyleBackColor = true;
-            this.btnSrInfo.Click += new System.EventHandler(this.btnSrInfo_Click);
+            this.lblSmartRayStatus.AutoSize = true;
+            this.lblSmartRayStatus.ForeColor = System.Drawing.Color.Firebrick;
+            this.lblSmartRayStatus.Location = new System.Drawing.Point(10, 92);
+            this.lblSmartRayStatus.Name = "lblSmartRayStatus";
+            this.lblSmartRayStatus.Size = new System.Drawing.Size(90, 12);
+            this.lblSmartRayStatus.TabIndex = 6;
+            this.lblSmartRayStatus.Text = "SmartRay: -";
             //
-            // grpGrab
+            // grpControl
             //
-            this.grpGrab.Controls.Add(this.btnGrab);
-            this.grpGrab.Controls.Add(this.txtProfileCount);
-            this.grpGrab.Controls.Add(this.lblProfileCount);
-            this.grpGrab.Location = new System.Drawing.Point(6, 162);
-            this.grpGrab.Name = "grpGrab";
-            this.grpGrab.Size = new System.Drawing.Size(448, 100);
-            this.grpGrab.TabIndex = 1;
-            this.grpGrab.TabStop = false;
-            this.grpGrab.Text = "2단계-B: 촬영 테스트 (실제로 레이저가 켜집니다. 주의)";
-            //
-            // lblProfileCount
-            //
-            this.lblProfileCount.AutoSize = true;
-            this.lblProfileCount.Location = new System.Drawing.Point(10, 30);
-            this.lblProfileCount.Name = "lblProfileCount";
-            this.lblProfileCount.Size = new System.Drawing.Size(65, 12);
-            this.lblProfileCount.TabIndex = 0;
-            this.lblProfileCount.Text = "프로파일 수";
-            //
-            // txtProfileCount
-            //
-            this.txtProfileCount.Location = new System.Drawing.Point(85, 27);
-            this.txtProfileCount.Name = "txtProfileCount";
-            this.txtProfileCount.Size = new System.Drawing.Size(60, 21);
-            this.txtProfileCount.TabIndex = 1;
-            this.txtProfileCount.Text = "100";
-            //
-            // btnGrab
-            //
-            this.btnGrab.BackColor = System.Drawing.Color.Goldenrod;
-            this.btnGrab.Location = new System.Drawing.Point(10, 60);
-            this.btnGrab.Name = "btnGrab";
-            this.btnGrab.Size = new System.Drawing.Size(220, 30);
-            this.btnGrab.TabIndex = 2;
-            this.btnGrab.Text = "1회 촬영 (레이저 켜짐)";
-            this.btnGrab.UseVisualStyleBackColor = false;
-            this.btnGrab.Click += new System.EventHandler(this.btnGrab_Click);
-            //
-            // tabPageIntegration
-            //
-            this.tabPageIntegration.Controls.Add(this.picHeightMap);
-            this.tabPageIntegration.Controls.Add(this.lblHeightMap);
-            this.tabPageIntegration.Controls.Add(this.grpContinuousScan);
-            this.tabPageIntegration.Location = new System.Drawing.Point(4, 22);
-            this.tabPageIntegration.Name = "tabPageIntegration";
-            this.tabPageIntegration.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageIntegration.Size = new System.Drawing.Size(968, 354);
-            this.tabPageIntegration.TabIndex = 2;
-            this.tabPageIntegration.Text = "연동 테스트";
-            this.tabPageIntegration.UseVisualStyleBackColor = true;
-            //
-            // grpContinuousScan
-            //
-            this.grpContinuousScan.Controls.Add(this.btnScanStop);
-            this.grpContinuousScan.Controls.Add(this.btnScanStart);
-            this.grpContinuousScan.Controls.Add(this.txtStartPos);
-            this.grpContinuousScan.Controls.Add(this.lblStartPos);
-            this.grpContinuousScan.Controls.Add(this.btnHome);
-            this.grpContinuousScan.Controls.Add(this.lblAcsStatus);
-            this.grpContinuousScan.Controls.Add(this.lblSmartRayStatus);
-            this.grpContinuousScan.Location = new System.Drawing.Point(6, 6);
-            this.grpContinuousScan.Name = "grpContinuousScan";
-            this.grpContinuousScan.Size = new System.Drawing.Size(448, 140);
-            this.grpContinuousScan.TabIndex = 0;
-            this.grpContinuousScan.TabStop = false;
-            this.grpContinuousScan.Text = "3단계: 이동 + 촬영 (ACS가 시작~끝으로 이동한 뒤 FreeRunning으로 촬영, ZMap 이미지로 표시)";
+            this.grpControl.Controls.Add(this.btnScanStop);
+            this.grpControl.Controls.Add(this.btnScanStart);
+            this.grpControl.Controls.Add(this.btnHome);
+            this.grpControl.Controls.Add(this.numMoveAxis);
+            this.grpControl.Controls.Add(this.lblMoveAxis);
+            this.grpControl.Controls.Add(this.txtStartPos);
+            this.grpControl.Controls.Add(this.lblStartPos);
+            this.grpControl.Location = new System.Drawing.Point(12, 297);
+            this.grpControl.Name = "grpControl";
+            this.grpControl.Size = new System.Drawing.Size(340, 180);
+            this.grpControl.TabIndex = 2;
+            this.grpControl.TabStop = false;
+            this.grpControl.Text = "동작 (시작위치 / Home / 촬상 / 중지)";
             //
             // lblStartPos
             //
@@ -497,38 +289,45 @@ namespace _3DVision
             //
             this.txtStartPos.Location = new System.Drawing.Point(100, 25);
             this.txtStartPos.Name = "txtStartPos";
-            this.txtStartPos.Size = new System.Drawing.Size(80, 21);
+            this.txtStartPos.Size = new System.Drawing.Size(90, 21);
             this.txtStartPos.TabIndex = 1;
             this.txtStartPos.Text = "-18.779";
             //
-            // lblAcsStatus
+            // lblMoveAxis
             //
-            this.lblAcsStatus.AutoSize = true;
-            this.lblAcsStatus.ForeColor = System.Drawing.Color.Firebrick;
-            this.lblAcsStatus.Location = new System.Drawing.Point(200, 28);
-            this.lblAcsStatus.Name = "lblAcsStatus";
-            this.lblAcsStatus.Size = new System.Drawing.Size(60, 12);
-            this.lblAcsStatus.TabIndex = 2;
-            this.lblAcsStatus.Text = "ACS: -";
+            this.lblMoveAxis.AutoSize = true;
+            this.lblMoveAxis.Location = new System.Drawing.Point(10, 58);
+            this.lblMoveAxis.Name = "lblMoveAxis";
+            this.lblMoveAxis.Size = new System.Drawing.Size(58, 12);
+            this.lblMoveAxis.TabIndex = 2;
+            this.lblMoveAxis.Text = "이동할 축";
             //
-            // lblSmartRayStatus
+            // numMoveAxis
             //
-            this.lblSmartRayStatus.AutoSize = true;
-            this.lblSmartRayStatus.ForeColor = System.Drawing.Color.Firebrick;
-            this.lblSmartRayStatus.Location = new System.Drawing.Point(320, 28);
-            this.lblSmartRayStatus.Name = "lblSmartRayStatus";
-            this.lblSmartRayStatus.Size = new System.Drawing.Size(90, 12);
-            this.lblSmartRayStatus.TabIndex = 3;
-            this.lblSmartRayStatus.Text = "SmartRay: -";
+            this.numMoveAxis.Location = new System.Drawing.Point(100, 55);
+            this.numMoveAxis.Maximum = new decimal(new int[] { 7, 0, 0, 0 });
+            this.numMoveAxis.Name = "numMoveAxis";
+            this.numMoveAxis.Size = new System.Drawing.Size(60, 21);
+            this.numMoveAxis.TabIndex = 3;
+            //
+            // btnHome
+            //
+            this.btnHome.Location = new System.Drawing.Point(10, 90);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(320, 34);
+            this.btnHome.TabIndex = 4;
+            this.btnHome.Text = "Home (시작 위치로)";
+            this.btnHome.UseVisualStyleBackColor = true;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
             //
             // btnScanStart
             //
             this.btnScanStart.BackColor = System.Drawing.Color.MediumSeaGreen;
-            this.btnScanStart.Location = new System.Drawing.Point(10, 60);
+            this.btnScanStart.Location = new System.Drawing.Point(10, 132);
             this.btnScanStart.Name = "btnScanStart";
-            this.btnScanStart.Size = new System.Drawing.Size(150, 32);
-            this.btnScanStart.TabIndex = 4;
-            this.btnScanStart.Text = "이동 + 촬영 시작";
+            this.btnScanStart.Size = new System.Drawing.Size(155, 36);
+            this.btnScanStart.TabIndex = 5;
+            this.btnScanStart.Text = "촬상 시작";
             this.btnScanStart.UseVisualStyleBackColor = false;
             this.btnScanStart.Click += new System.EventHandler(this.btnScanStart_Click);
             //
@@ -537,99 +336,208 @@ namespace _3DVision
             this.btnScanStop.BackColor = System.Drawing.Color.Firebrick;
             this.btnScanStop.ForeColor = System.Drawing.Color.White;
             this.btnScanStop.Enabled = false;
-            this.btnScanStop.Location = new System.Drawing.Point(170, 60);
+            this.btnScanStop.Location = new System.Drawing.Point(175, 132);
             this.btnScanStop.Name = "btnScanStop";
-            this.btnScanStop.Size = new System.Drawing.Size(100, 32);
-            this.btnScanStop.TabIndex = 5;
+            this.btnScanStop.Size = new System.Drawing.Size(155, 36);
+            this.btnScanStop.TabIndex = 6;
             this.btnScanStop.Text = "중지";
             this.btnScanStop.UseVisualStyleBackColor = false;
             this.btnScanStop.Click += new System.EventHandler(this.btnScanStop_Click);
             //
-            // btnHome
-            //
-            this.btnHome.Location = new System.Drawing.Point(280, 60);
-            this.btnHome.Name = "btnHome";
-            this.btnHome.Size = new System.Drawing.Size(150, 32);
-            this.btnHome.TabIndex = 6;
-            this.btnHome.Text = "Home (시작 위치로)";
-            this.btnHome.UseVisualStyleBackColor = true;
-            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
-            //
             // lblHeightMap
             //
             this.lblHeightMap.AutoSize = true;
-            this.lblHeightMap.Location = new System.Drawing.Point(470, 6);
+            this.lblHeightMap.Location = new System.Drawing.Point(372, 12);
             this.lblHeightMap.Name = "lblHeightMap";
             this.lblHeightMap.Size = new System.Drawing.Size(100, 12);
-            this.lblHeightMap.TabIndex = 7;
+            this.lblHeightMap.TabIndex = 3;
             this.lblHeightMap.Text = "높이맵 (그레이스케일)";
             //
             // picHeightMap
             //
-            this.picHeightMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.picHeightMap.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.picHeightMap.BackColor = System.Drawing.Color.Black;
             this.picHeightMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picHeightMap.Location = new System.Drawing.Point(470, 22);
+            this.picHeightMap.Location = new System.Drawing.Point(372, 28);
             this.picHeightMap.Name = "picHeightMap";
-            this.picHeightMap.Size = new System.Drawing.Size(492, 326);
+            this.picHeightMap.Size = new System.Drawing.Size(440, 600);
             this.picHeightMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picHeightMap.TabIndex = 1;
+            this.picHeightMap.TabIndex = 4;
             this.picHeightMap.TabStop = false;
+            //
+            // lblIntensity
+            //
+            this.lblIntensity.AutoSize = true;
+            this.lblIntensity.Location = new System.Drawing.Point(832, 12);
+            this.lblIntensity.Name = "lblIntensity";
+            this.lblIntensity.Size = new System.Drawing.Size(150, 12);
+            this.lblIntensity.TabIndex = 5;
+            this.lblIntensity.Text = "Intensity 화면 (촬상 완료 시 갱신)";
+            //
+            // picIntensity
+            //
+            this.picIntensity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.picIntensity.BackColor = System.Drawing.Color.Black;
+            this.picIntensity.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picIntensity.Location = new System.Drawing.Point(832, 28);
+            this.picIntensity.Name = "picIntensity";
+            this.picIntensity.Size = new System.Drawing.Size(440, 600);
+            this.picIntensity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picIntensity.TabIndex = 6;
+            this.picIntensity.TabStop = false;
+            //
+            // lblLive
+            //
+            this.lblLive.AutoSize = true;
+            this.lblLive.Location = new System.Drawing.Point(1292, 12);
+            this.lblLive.Name = "lblLive";
+            this.lblLive.Size = new System.Drawing.Size(150, 12);
+            this.lblLive.TabIndex = 7;
+            this.lblLive.Text = "Live 화면 (원본 카메라, 촬상 중엔 사용 불가)";
+            //
+            // btnLiveStart
+            //
+            this.btnLiveStart.BackColor = System.Drawing.Color.Goldenrod;
+            this.btnLiveStart.Location = new System.Drawing.Point(1292, 28);
+            this.btnLiveStart.Name = "btnLiveStart";
+            this.btnLiveStart.Size = new System.Drawing.Size(110, 26);
+            this.btnLiveStart.TabIndex = 8;
+            this.btnLiveStart.Text = "Live 시작";
+            this.btnLiveStart.UseVisualStyleBackColor = false;
+            this.btnLiveStart.Click += new System.EventHandler(this.btnLiveStart_Click);
+            //
+            // btnLiveStop
+            //
+            this.btnLiveStop.Enabled = false;
+            this.btnLiveStop.Location = new System.Drawing.Point(1408, 28);
+            this.btnLiveStop.Name = "btnLiveStop";
+            this.btnLiveStop.Size = new System.Drawing.Size(90, 26);
+            this.btnLiveStop.TabIndex = 9;
+            this.btnLiveStop.Text = "Live 정지";
+            this.btnLiveStop.UseVisualStyleBackColor = true;
+            this.btnLiveStop.Click += new System.EventHandler(this.btnLiveStop_Click);
+            //
+            // lblRepeatStart
+            //
+            this.lblRepeatStart.AutoSize = true;
+            this.lblRepeatStart.Location = new System.Drawing.Point(1292, 61);
+            this.lblRepeatStart.Name = "lblRepeatStart";
+            this.lblRepeatStart.Size = new System.Drawing.Size(46, 12);
+            this.lblRepeatStart.TabIndex = 10;
+            this.lblRepeatStart.Text = "시작거리";
+            //
+            // txtRepeatStartPos
+            //
+            this.txtRepeatStartPos.Location = new System.Drawing.Point(1350, 58);
+            this.txtRepeatStartPos.Name = "txtRepeatStartPos";
+            this.txtRepeatStartPos.Size = new System.Drawing.Size(75, 21);
+            this.txtRepeatStartPos.TabIndex = 11;
+            this.txtRepeatStartPos.Text = "-18.779";
+            //
+            // lblRepeatEnd
+            //
+            this.lblRepeatEnd.AutoSize = true;
+            this.lblRepeatEnd.Location = new System.Drawing.Point(1435, 61);
+            this.lblRepeatEnd.Name = "lblRepeatEnd";
+            this.lblRepeatEnd.Size = new System.Drawing.Size(40, 12);
+            this.lblRepeatEnd.TabIndex = 12;
+            this.lblRepeatEnd.Text = "끝거리";
+            //
+            // txtRepeatEndPos
+            //
+            this.txtRepeatEndPos.Location = new System.Drawing.Point(1487, 58);
+            this.txtRepeatEndPos.Name = "txtRepeatEndPos";
+            this.txtRepeatEndPos.Size = new System.Drawing.Size(75, 21);
+            this.txtRepeatEndPos.TabIndex = 13;
+            this.txtRepeatEndPos.Text = "130.221";
+            //
+            // btnRepeat
+            //
+            this.btnRepeat.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.btnRepeat.Location = new System.Drawing.Point(1292, 86);
+            this.btnRepeat.Name = "btnRepeat";
+            this.btnRepeat.Size = new System.Drawing.Size(440, 30);
+            this.btnRepeat.TabIndex = 14;
+            this.btnRepeat.Text = "반복 동작 시작";
+            this.btnRepeat.UseVisualStyleBackColor = false;
+            this.btnRepeat.Click += new System.EventHandler(this.btnRepeat_Click);
+            //
+            // picLiveImage
+            //
+            this.picLiveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.picLiveImage.BackColor = System.Drawing.Color.Black;
+            this.picLiveImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picLiveImage.Location = new System.Drawing.Point(1292, 122);
+            this.picLiveImage.Name = "picLiveImage";
+            this.picLiveImage.Size = new System.Drawing.Size(440, 506);
+            this.picLiveImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picLiveImage.TabIndex = 15;
+            this.picLiveImage.TabStop = false;
             //
             // lblLog
             //
             this.lblLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblLog.AutoSize = true;
-            this.lblLog.Location = new System.Drawing.Point(13, 402);
+            this.lblLog.Location = new System.Drawing.Point(13, 650);
             this.lblLog.Name = "lblLog";
             this.lblLog.Size = new System.Drawing.Size(24, 12);
-            this.lblLog.TabIndex = 1;
+            this.lblLog.TabIndex = 11;
             this.lblLog.Text = "로그";
             //
             // txtLog
             //
             this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtLog.Location = new System.Drawing.Point(12, 418);
+            this.txtLog.Location = new System.Drawing.Point(12, 666);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(976, 220);
-            this.txtLog.TabIndex = 2;
+            this.txtLog.Size = new System.Drawing.Size(1720, 210);
+            this.txtLog.TabIndex = 12;
             //
             // MainForm
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 650);
+            this.ClientSize = new System.Drawing.Size(1752, 890);
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblLog);
-            this.Controls.Add(this.tabMain);
+            this.Controls.Add(this.picLiveImage);
+            this.Controls.Add(this.btnRepeat);
+            this.Controls.Add(this.txtRepeatEndPos);
+            this.Controls.Add(this.lblRepeatEnd);
+            this.Controls.Add(this.txtRepeatStartPos);
+            this.Controls.Add(this.lblRepeatStart);
+            this.Controls.Add(this.btnLiveStop);
+            this.Controls.Add(this.btnLiveStart);
+            this.Controls.Add(this.lblLive);
+            this.Controls.Add(this.picIntensity);
+            this.Controls.Add(this.lblIntensity);
+            this.Controls.Add(this.picHeightMap);
+            this.Controls.Add(this.lblHeightMap);
+            this.Controls.Add(this.grpControl);
+            this.Controls.Add(this.grpSmartRay);
+            this.Controls.Add(this.grpAcs);
             this.Name = "MainForm";
             this.Text = "3DVision - ACS/SmartRay 연동 테스트";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.tabMain.ResumeLayout(false);
-            this.tabPageAcs.ResumeLayout(false);
             this.grpAcs.ResumeLayout(false);
             this.grpAcs.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numAxis)).EndInit();
-            this.grpMove.ResumeLayout(false);
-            this.grpMove.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).EndInit();
-            this.tabPageSmartRay.ResumeLayout(false);
             this.grpSmartRay.ResumeLayout(false);
             this.grpSmartRay.PerformLayout();
-            this.grpGrab.ResumeLayout(false);
-            this.grpGrab.PerformLayout();
-            this.tabPageIntegration.ResumeLayout(false);
-            this.grpContinuousScan.ResumeLayout(false);
-            this.grpContinuousScan.PerformLayout();
+            this.grpControl.ResumeLayout(false);
+            this.grpControl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMoveAxis)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picHeightMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picIntensity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picLiveImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -637,53 +545,46 @@ namespace _3DVision
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabMain;
-        private System.Windows.Forms.TabPage tabPageAcs;
         private System.Windows.Forms.GroupBox grpAcs;
         private System.Windows.Forms.Label lblIp;
         private System.Windows.Forms.TextBox txtIp;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Button btnDisconnect;
-        private System.Windows.Forms.Button btnCheckStatus;
-        private System.Windows.Forms.Label lblAxis;
-        private System.Windows.Forms.NumericUpDown numAxis;
+        private System.Windows.Forms.Label lblJogStep;
+        private System.Windows.Forms.TextBox txtJogStep;
+        private System.Windows.Forms.Button btnJogMinus;
+        private System.Windows.Forms.Button btnJogPlus;
+        private System.Windows.Forms.Label lblAcsStatus;
         private System.Windows.Forms.Label lblLog;
         private System.Windows.Forms.TextBox txtLog;
-        private System.Windows.Forms.GroupBox grpMove;
-        private System.Windows.Forms.Label lblMoveAxis;
-        private System.Windows.Forms.NumericUpDown numMoveAxis;
-        private System.Windows.Forms.Button btnEnable;
-        private System.Windows.Forms.Button btnDisable;
-        private System.Windows.Forms.Label lblDistance;
-        private System.Windows.Forms.TextBox txtDistance;
-        private System.Windows.Forms.Button btnMoveMinus;
-        private System.Windows.Forms.Button btnMovePlus;
-        private System.Windows.Forms.Button btnStop;
-        private System.Windows.Forms.TabPage tabPageSmartRay;
         private System.Windows.Forms.GroupBox grpSmartRay;
-        private System.Windows.Forms.Button btnDiscover;
-        private System.Windows.Forms.ComboBox cmbSensors;
         private System.Windows.Forms.Label lblSrIp;
         private System.Windows.Forms.TextBox txtSrIp;
         private System.Windows.Forms.Label lblSrPort;
         private System.Windows.Forms.TextBox txtSrPort;
         private System.Windows.Forms.Button btnSrConnect;
         private System.Windows.Forms.Button btnSrDisconnect;
-        private System.Windows.Forms.Button btnSrInfo;
-        private System.Windows.Forms.GroupBox grpGrab;
-        private System.Windows.Forms.Button btnGrab;
-        private System.Windows.Forms.TextBox txtProfileCount;
-        private System.Windows.Forms.Label lblProfileCount;
-        private System.Windows.Forms.TabPage tabPageIntegration;
-        private System.Windows.Forms.GroupBox grpContinuousScan;
+        private System.Windows.Forms.Label lblSmartRayStatus;
+        private System.Windows.Forms.GroupBox grpControl;
         private System.Windows.Forms.Label lblStartPos;
         private System.Windows.Forms.TextBox txtStartPos;
+        private System.Windows.Forms.Label lblMoveAxis;
+        private System.Windows.Forms.NumericUpDown numMoveAxis;
+        private System.Windows.Forms.Button btnHome;
         private System.Windows.Forms.Button btnScanStart;
         private System.Windows.Forms.Button btnScanStop;
-        private System.Windows.Forms.Button btnHome;
-        private System.Windows.Forms.Label lblAcsStatus;
-        private System.Windows.Forms.Label lblSmartRayStatus;
-        private System.Windows.Forms.PictureBox picHeightMap;
         private System.Windows.Forms.Label lblHeightMap;
+        private System.Windows.Forms.PictureBox picHeightMap;
+        private System.Windows.Forms.Label lblIntensity;
+        private System.Windows.Forms.PictureBox picIntensity;
+        private System.Windows.Forms.Label lblLive;
+        private System.Windows.Forms.Button btnLiveStart;
+        private System.Windows.Forms.Button btnLiveStop;
+        private System.Windows.Forms.Label lblRepeatStart;
+        private System.Windows.Forms.TextBox txtRepeatStartPos;
+        private System.Windows.Forms.Label lblRepeatEnd;
+        private System.Windows.Forms.TextBox txtRepeatEndPos;
+        private System.Windows.Forms.Button btnRepeat;
+        private System.Windows.Forms.PictureBox picLiveImage;
     }
 }
