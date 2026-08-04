@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACS.SPiiPlusNET;
@@ -97,6 +98,67 @@ namespace _3DVision
             }
 
             UpdateConnectionStatusLabels();
+        }
+
+        // 컨트롤러가 리셋되어 ACSPL+ Buffer 2(PEG 설정)가 날아갔을 때를 대비한 수동 재설정 버튼.
+        // Buffer 2가 정상적으로 자동 실행되어 있다면 눌러도 똑같은 설정을 다시 적용할 뿐이라 안전하다.
+        private void btnSetupPeg_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _acs.SetupPegTrigger();
+                Log("PEG 트리거 설정을 적용했습니다 (axis 0 위치 → axis 4 펄스 출력, 0.025mm당 1펄스).");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log(ex.Message);
+            }
+            catch (COMException ex)
+            {
+                Log("PEG 트리거 설정 실패 (COMException): " + ex.Message);
+            }
+            catch (ACSException ex)
+            {
+                Log("PEG 트리거 설정 실패 (ACSException): " + ex.Message);
+            }
+        }
+
+        // 컨트롤러의 ACSPL+ Buffer 0(axis 0 홈잡기)을 원격으로 실행한다. 실제로 리밋 스위치를 향해 축이
+        // 움직이므로, 같은 축을 쓰는 반복동작/촬상과 동시에 돌지 않도록 그동안 막아둔다.
+        private void btnHomeAxis_Click(object sender, EventArgs e)
+        {
+            btnHomeAxis.Enabled = false;
+            btnRepeat.Enabled = false;
+            btnScanStart.Enabled = false;
+            Log("[홈잡기] Axis 0 홈잡기를 시작합니다 (Buffer 0 실행)...");
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    bool success = _acs.RunHomingBuffer(120000, step => LogSafe("  단계: " + step));
+                    LogSafe(success
+                        ? "[홈잡기] 완료되었습니다."
+                        : "[홈잡기] 실패했거나 시간 안에 끝나지 않았습니다. ACS 프로그램에서 로그를 확인하세요.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    LogSafe(ex.Message);
+                }
+                catch (COMException ex)
+                {
+                    LogSafe("[홈잡기] 오류 발생 (COMException): " + ex.Message);
+                }
+                catch (ACSException ex)
+                {
+                    LogSafe("[홈잡기] 오류 발생 (ACSException): " + ex.Message);
+                }
+            }).ContinueWith(t => Invoke(new Action(() =>
+            {
+                btnHomeAxis.Enabled = true;
+                btnRepeat.Enabled = true;
+                btnScanStart.Enabled = true;
+            })));
         }
 
         private void btnJogPlus_Click(object sender, EventArgs e)
@@ -226,11 +288,12 @@ namespace _3DVision
         }
 
         // 반복동작(아래 참고)은 ACS 이동만 하고 SmartRay 센서를 전혀 건드리지 않으므로, Live와 동시에 켜도 된다.
-        // 그래서 여기서는 btnRepeat을 건드리지 않고, 센서를 같이 쓰는 btnScanStart(실제 촬상)만 막는다.
+        // 그래서 여기서는 btnRepeat을 건드리지 않고, 센서를 같이 쓰는 btnScanStart/btnTriggerGrab만 막는다.
         private void btnLiveStart_Click(object sender, EventArgs e)
         {
             btnLiveStart.Enabled = false;
             btnScanStart.Enabled = false;
+            btnTriggerGrab.Enabled = false;
             try
             {
                 Log("Live 화면을 시작합니다 (레이저 ON)...");
@@ -242,12 +305,14 @@ namespace _3DVision
                 Log(ex.Message);
                 btnLiveStart.Enabled = true;
                 btnScanStart.Enabled = true;
+                btnTriggerGrab.Enabled = true;
             }
             catch (SmartRayApiException ex)
             {
                 Log("Live 시작 실패 (SmartRayApiException): " + ex.Message);
                 btnLiveStart.Enabled = true;
                 btnScanStart.Enabled = true;
+                btnTriggerGrab.Enabled = true;
             }
         }
 
@@ -257,6 +322,7 @@ namespace _3DVision
             Log("Live 화면을 정지했습니다 (레이저 OFF).");
             btnLiveStart.Enabled = true;
             btnScanStart.Enabled = true;
+            btnTriggerGrab.Enabled = true;
             btnLiveStop.Enabled = false;
         }
 
@@ -392,7 +458,12 @@ namespace _3DVision
         }
 
         // 이동하는 내내 레이저가 켜져 있도록, 이동 시간보다 넉넉하게 걸릴 만큼 큰 프로파일 수를 요청한다.
-        private const int ScanGrabProfileCount = 5000;
+        private const int ScanGrabProfileCount = 7000;
+
+        // 트리거 그랩(외부 트리거) 전용 대기 시간. 트리거가 이 시간(ms) 동안 끊기면 한 패스가 끝난 것으로
+        // 보고 그때까지 쌓인 데이터로 마감한다. 트리거가 한 번도 안 들어오는 경우를 위한 최종 안전장치 시간도 함께 둔다.
+        private const int TriggerGrabIdleTimeoutMs = 1500;
+        private const int TriggerGrabOverallTimeoutMs = 180000;
 
         // 자재 끝 위치는 실측으로 확인된 고정값이라 UI에서 입력받지 않는다.
         private const double ScanEndPosition = 130.221;
@@ -422,9 +493,10 @@ namespace _3DVision
         private void btnScanStop_Click(object sender, EventArgs e)
         {
             // 이동 중일 수 있으므로 즉시 정지시키고, 레이저도 반드시 끈다.
-            // 반복동작 진행 중이었다면 다음 왕복으로 넘어가지 않도록 플래그도 내린다.
+            // 반복동작/트리거 그랩 진행 중이었다면 다음 패스로 넘어가지 않도록 플래그도 내린다.
             int axisIndex = (int)numMoveAxis.Value;
             _repeatRunning = false;
+            _triggerGrabRunning = false;
             _acs.Stop(axisIndex);
             _smartRay.StopZMapCapture();
             Log("[촬상] 비상 정지: 모터 정지 + 레이저 OFF");
@@ -437,11 +509,17 @@ namespace _3DVision
             // 촬영 중에는 Live 화면/반복동작을 켤 수 없다 (센서가 한 번에 하나의 모드만 가능).
             btnLiveStart.Enabled = !running;
             btnRepeat.Enabled = !running;
+            btnTriggerGrab.Enabled = !running;
         }
 
         // "반복동작" 버튼 하나로 시작/정지를 토글한다. 시작거리 ↔ 끝거리 입력창(txtRepeatStartPos/txtRepeatEndPos)을
         // 별도로 두어, 위쪽 "동작" 그룹의 시작위치/촬상과는 독립적으로 왕복 구간을 설정할 수 있다.
         private volatile bool _repeatRunning;
+
+        // 반복동작이 한쪽 끝에 도착할 때마다(한 패스 완료) Set된다. 트리거 그랩이 이 신호를 기다렸다가
+        // 정확히 그 시점에 촬영을 끊도록 하기 위한 용도 - Input1 트리거가 방향전환 중에도 계속 들어와서
+        // 왕복 두 번 분량이 한 이미지에 이어붙는 문제를 막는다 (트리거 침묵 시간에 의존하지 않음).
+        private readonly AutoResetEvent _legCompletedEvent = new AutoResetEvent(false);
 
         private void btnRepeat_Click(object sender, EventArgs e)
         {
@@ -452,17 +530,8 @@ namespace _3DVision
                 return;
             }
 
-            if (!double.TryParse(txtRepeatStartPos.Text.Trim(), out double startPos))
-            {
-                Log("반복동작 시작거리 값이 올바르지 않습니다: " + txtRepeatStartPos.Text);
+            if (!TryGetRepeatPositions(out double startPos, out double endPos))
                 return;
-            }
-
-            if (!double.TryParse(txtRepeatEndPos.Text.Trim(), out double endPos))
-            {
-                Log("반복동작 끝거리 값이 올바르지 않습니다: " + txtRepeatEndPos.Text);
-                return;
-            }
 
             if (startPos == endPos)
             {
@@ -475,8 +544,37 @@ namespace _3DVision
             _repeatRunning = true;
             SetRepeatRunningState(true);
 
-            Task.Run(() => RunRepeatMove(axisIndex, startPos, endPos))
+            Task.Run(() => RunRepeatMove(axisIndex))
                 .ContinueWith(t => Invoke(new Action(() => SetRepeatRunningState(false))));
+        }
+
+        // txtRepeatStartPos/txtRepeatEndPos는 UI 컨트롤이라 백그라운드 스레드(RunRepeatMove)에서 직접 읽으면
+        // 안 되므로 Invoke로 UI 스레드에서 읽어온다. 값이 잘못됐으면 로그만 남기고 false를 반환한다.
+        private bool TryGetRepeatPositions(out double startPos, out double endPos)
+        {
+            startPos = 0;
+            endPos = 0;
+
+            string startText = null, endText = null;
+            Invoke(new Action(() =>
+            {
+                startText = txtRepeatStartPos.Text.Trim();
+                endText = txtRepeatEndPos.Text.Trim();
+            }));
+
+            if (!double.TryParse(startText, out startPos))
+            {
+                Log("반복동작 시작거리 값이 올바르지 않습니다: " + startText);
+                return false;
+            }
+
+            if (!double.TryParse(endText, out endPos))
+            {
+                Log("반복동작 끝거리 값이 올바르지 않습니다: " + endText);
+                return false;
+            }
+
+            return true;
         }
 
         // 반복동작은 ACS 이동만 반복할 뿐 SmartRay 촬영은 하지 않으므로, Live 화면과는 동시에 켤 수 있다
@@ -491,13 +589,30 @@ namespace _3DVision
 
         // 시작거리 ↔ 끝거리 사이를 ACS 이동만으로 계속 왕복한다 (SmartRay 촬영 없음).
         // Live 화면을 켜놓은 상태에서 대상물이 지나가는 모습만 확인하고 싶을 때 쓰는 용도다.
-        private void RunRepeatMove(int axisIndex, double posA, double posB)
+        // 매 왕복(leg)을 시작하기 직전마다 텍스트박스 값을 다시 읽으므로, 반복동작 중에 시작/끝 거리를
+        // 바꾸면 정지 없이도 다음 이동부터 바로 반영된다.
+        private void RunRepeatMove(int axisIndex)
         {
-            LogSafe(string.Format("[반복동작] 시작: {0:0.###} ↔ {1:0.###} 왕복 (ACS 이동만, 촬영 없음)", posA, posB));
+            LogSafe("[반복동작] 시작");
 
             bool goingToB = true;
+            double posA = 0, posB = 0;
             while (_repeatRunning)
             {
+                if (!TryGetRepeatPositions(out double newPosA, out double newPosB))
+                {
+                    LogSafe("[반복동작] 시작/끝 거리 값이 올바르지 않아 이전 값으로 계속 진행합니다.");
+                }
+                else if (newPosA == newPosB)
+                {
+                    LogSafe("[반복동작] 시작거리와 끝거리가 같아 이전 값으로 계속 진행합니다.");
+                }
+                else
+                {
+                    posA = newPosA;
+                    posB = newPosB;
+                }
+
                 double target = goingToB ? posB : posA;
                 try
                 {
@@ -508,6 +623,8 @@ namespace _3DVision
                         LogSafe("[반복동작] 이동이 시간 안에 끝나지 않아 중단합니다.");
                         break;
                     }
+
+                    _legCompletedEvent.Set();
                 }
                 catch (Exception ex)
                 {
@@ -520,6 +637,99 @@ namespace _3DVision
 
             _repeatRunning = false;
             LogSafe("[반복동작] 정지되었습니다.");
+        }
+
+        // "트리거 그랩" 버튼 하나로 시작/정지를 토글한다. ACS 이동 명령은 전혀 내리지 않는다 - ACS는
+        // 반복동작(btnRepeat) 등으로 이미 별도로 왕복 중이라고 가정하고, 그 왕복 중 Input1으로 들어오는
+        // 트리거만 받아 SmartRay로 촬영한다. 그래서 btnRepeat과 동시에 켜두는 것이 정상적인 사용법이다.
+        private volatile bool _triggerGrabRunning;
+
+        private void btnTriggerGrab_Click(object sender, EventArgs e)
+        {
+            if (_triggerGrabRunning)
+            {
+                _triggerGrabRunning = false;
+                Log("[트리거 그랩] 정지를 요청했습니다. 현재 진행 중인 촬영이 끝나는 대로 멈춥니다...");
+                return;
+            }
+
+            _triggerGrabRunning = true;
+            SetTriggerGrabRunningState(true);
+
+            Task.Run(() => RunTriggerGrabLoop())
+                .ContinueWith(t => Invoke(new Action(() => SetTriggerGrabRunningState(false))));
+        }
+
+        // 트리거 그랩은 SmartRay 촬영만 반복할 뿐 ACS는 건드리지 않으므로, 반복동작과는 동시에 켤 수 있다
+        // (센서를 같이 쓰는 촬상/Live만 막는다).
+        private void SetTriggerGrabRunningState(bool running)
+        {
+            btnTriggerGrab.Text = running ? "트리거 그랩 정지" : "트리거 그랩 시작 (Input1)";
+            btnTriggerGrab.BackColor = running ? Color.Firebrick : Color.MediumSeaGreen;
+            btnScanStart.Enabled = !running;
+            btnLiveStart.Enabled = !running;
+        }
+
+        // Input1으로 들어오는 외부 트리거를 받아 ZMap을 촬영한다. 한 패스가 끝날 때마다 화면을 갱신하고,
+        // 다시 재무장해서 다음 패스를 기다린다 - ACS가 반복동작으로 왕복하는 동안 계속 이 상태를 유지하면
+        // 매 왕복마다 새 ZMap을 받아볼 수 있다.
+        private void RunTriggerGrabLoop()
+        {
+            LogSafe("[트리거 그랩] 시작: Input1 외부 트리거 대기");
+
+            while (_triggerGrabRunning)
+            {
+                try
+                {
+                    _smartRay.ArmZMapCaptureExternalTrigger(ScanGrabProfileCount, step => LogSafe("  단계: " + step));
+                    _legCompletedEvent.Reset();
+
+                    var result = WaitForPassResult();
+                    if (result == null)
+                    {
+                        LogSafe(string.Format("[트리거 그랩] 대기 시간({0}초) 안에 패스 완료를 확인하지 못했습니다. ACS가 움직이고 있는지, Input1 배선이 맞는지 확인하세요. 계속 대기합니다...", TriggerGrabOverallTimeoutMs / 1000));
+                        continue;
+                    }
+
+                    var s = AnalyzeZMap(result);
+                    LogSafe(string.Format("[트리거 그랩] 완료: {0}x{1}, 전체 {2}점 중 유효 {3}점, raw Z:[{4}, {5}]",
+                        result.Width, result.Height, s.total, s.valid, s.minRaw, s.maxRaw));
+
+                    if (s.valid > 0)
+                    {
+                        ShowZMapImage(result);
+                        ShowIntensityImage(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogSafe(string.Format("[트리거 그랩] 오류 발생 ({0}): {1}", ex.GetType().Name, ex.Message));
+                    break;
+                }
+                finally
+                {
+                    _smartRay.StopZMapCapture();
+                }
+            }
+
+            _triggerGrabRunning = false;
+            LogSafe("[트리거 그랩] 정지되었습니다.");
+        }
+
+        // 반복동작(btnRepeat)이 이 프로그램에서 함께 돌고 있으면, 트리거 침묵 시간 대신 ACS가 실제로
+        // 한쪽 끝에 도착한 시점(_legCompletedEvent)에 맞춰 정확히 패스를 끊는다. Input1은 위치 기반이라
+        // 방향전환 중에도 트리거가 계속 들어올 수 있어서, 침묵 시간만 보면 왕복 두 번 분량이 한 이미지에
+        // 이어붙는 문제가 생기기 때문이다. 반복동작이 이 프로그램 밖(별도 ACS 프로그램)에서 돌고 있어서
+        // 이 신호를 알 수 없을 때는, 기존처럼 트리거 침묵 시간(idle timeout)으로 패스 종료를 추정한다.
+        private ZMapResult WaitForPassResult()
+        {
+            if (_repeatRunning)
+            {
+                bool legDone = _legCompletedEvent.WaitOne(TriggerGrabOverallTimeoutMs);
+                return legDone ? _smartRay.FinishCaptureNow() : null;
+            }
+
+            return _smartRay.WaitForZMapCaptureUntilIdle(TriggerGrabIdleTimeoutMs, TriggerGrabOverallTimeoutMs);
         }
 
         // "촬상 시작" 버튼 전용: 편도 1회(시작위치 이동 → 레이저 ON → 촬영하며 끝위치까지 이동 → 결과 표시)를 수행한다.
@@ -604,6 +814,7 @@ namespace _3DVision
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             _repeatRunning = false;
+            _triggerGrabRunning = false;
 
             if (_acs.IsConnected)
             {

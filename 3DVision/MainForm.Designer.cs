@@ -34,6 +34,8 @@ namespace _3DVision
             this.txtJogStep = new System.Windows.Forms.TextBox();
             this.lblJogStep = new System.Windows.Forms.Label();
             this.lblAcsStatus = new System.Windows.Forms.Label();
+            this.btnSetupPeg = new System.Windows.Forms.Button();
+            this.btnHomeAxis = new System.Windows.Forms.Button();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.txtIp = new System.Windows.Forms.TextBox();
@@ -66,6 +68,7 @@ namespace _3DVision
             this.lblRepeatEnd = new System.Windows.Forms.Label();
             this.txtRepeatEndPos = new System.Windows.Forms.TextBox();
             this.btnRepeat = new System.Windows.Forms.Button();
+            this.btnTriggerGrab = new System.Windows.Forms.Button();
             this.picLiveImage = new System.Windows.Forms.PictureBox();
             this.lblLog = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
@@ -80,6 +83,8 @@ namespace _3DVision
             //
             // grpAcs
             //
+            this.grpAcs.Controls.Add(this.btnHomeAxis);
+            this.grpAcs.Controls.Add(this.btnSetupPeg);
             this.grpAcs.Controls.Add(this.btnJogPlus);
             this.grpAcs.Controls.Add(this.btnJogMinus);
             this.grpAcs.Controls.Add(this.txtJogStep);
@@ -91,7 +96,7 @@ namespace _3DVision
             this.grpAcs.Controls.Add(this.lblIp);
             this.grpAcs.Location = new System.Drawing.Point(12, 12);
             this.grpAcs.Name = "grpAcs";
-            this.grpAcs.Size = new System.Drawing.Size(340, 150);
+            this.grpAcs.Size = new System.Drawing.Size(340, 230);
             this.grpAcs.TabIndex = 0;
             this.grpAcs.TabStop = false;
             this.grpAcs.Text = "ACS 연결";
@@ -174,11 +179,31 @@ namespace _3DVision
             //
             this.lblAcsStatus.AutoSize = true;
             this.lblAcsStatus.ForeColor = System.Drawing.Color.Firebrick;
-            this.lblAcsStatus.Location = new System.Drawing.Point(10, 128);
+            this.lblAcsStatus.Location = new System.Drawing.Point(10, 198);
             this.lblAcsStatus.Name = "lblAcsStatus";
             this.lblAcsStatus.Size = new System.Drawing.Size(60, 12);
             this.lblAcsStatus.TabIndex = 8;
             this.lblAcsStatus.Text = "ACS: -";
+            //
+            // btnSetupPeg
+            //
+            this.btnSetupPeg.Location = new System.Drawing.Point(10, 125);
+            this.btnSetupPeg.Name = "btnSetupPeg";
+            this.btnSetupPeg.Size = new System.Drawing.Size(320, 30);
+            this.btnSetupPeg.TabIndex = 9;
+            this.btnSetupPeg.Text = "PEG 트리거 설정 (axis 0 → axis 4, Input1)";
+            this.btnSetupPeg.UseVisualStyleBackColor = true;
+            this.btnSetupPeg.Click += new System.EventHandler(this.btnSetupPeg_Click);
+            //
+            // btnHomeAxis
+            //
+            this.btnHomeAxis.Location = new System.Drawing.Point(10, 161);
+            this.btnHomeAxis.Name = "btnHomeAxis";
+            this.btnHomeAxis.Size = new System.Drawing.Size(320, 30);
+            this.btnHomeAxis.TabIndex = 10;
+            this.btnHomeAxis.Text = "축 0 홈잡기 (Buffer 0 실행)";
+            this.btnHomeAxis.UseVisualStyleBackColor = true;
+            this.btnHomeAxis.Click += new System.EventHandler(this.btnHomeAxis_Click);
             //
             // grpSmartRay
             //
@@ -189,7 +214,7 @@ namespace _3DVision
             this.grpSmartRay.Controls.Add(this.lblSrPort);
             this.grpSmartRay.Controls.Add(this.txtSrIp);
             this.grpSmartRay.Controls.Add(this.lblSrIp);
-            this.grpSmartRay.Location = new System.Drawing.Point(12, 172);
+            this.grpSmartRay.Location = new System.Drawing.Point(12, 252);
             this.grpSmartRay.Name = "grpSmartRay";
             this.grpSmartRay.Size = new System.Drawing.Size(340, 115);
             this.grpSmartRay.TabIndex = 1;
@@ -269,7 +294,7 @@ namespace _3DVision
             this.grpControl.Controls.Add(this.lblMoveAxis);
             this.grpControl.Controls.Add(this.txtStartPos);
             this.grpControl.Controls.Add(this.lblStartPos);
-            this.grpControl.Location = new System.Drawing.Point(12, 297);
+            this.grpControl.Location = new System.Drawing.Point(12, 377);
             this.grpControl.Name = "grpControl";
             this.grpControl.Size = new System.Drawing.Size(340, 180);
             this.grpControl.TabIndex = 2;
@@ -464,6 +489,17 @@ namespace _3DVision
             this.btnRepeat.UseVisualStyleBackColor = false;
             this.btnRepeat.Click += new System.EventHandler(this.btnRepeat_Click);
             //
+            // btnTriggerGrab
+            //
+            this.btnTriggerGrab.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.btnTriggerGrab.Location = new System.Drawing.Point(1292, 120);
+            this.btnTriggerGrab.Name = "btnTriggerGrab";
+            this.btnTriggerGrab.Size = new System.Drawing.Size(440, 30);
+            this.btnTriggerGrab.TabIndex = 15;
+            this.btnTriggerGrab.Text = "트리거 그랩 시작 (Input1)";
+            this.btnTriggerGrab.UseVisualStyleBackColor = false;
+            this.btnTriggerGrab.Click += new System.EventHandler(this.btnTriggerGrab_Click);
+            //
             // picLiveImage
             //
             this.picLiveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -471,11 +507,11 @@ namespace _3DVision
             | System.Windows.Forms.AnchorStyles.Right)));
             this.picLiveImage.BackColor = System.Drawing.Color.Black;
             this.picLiveImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picLiveImage.Location = new System.Drawing.Point(1292, 122);
+            this.picLiveImage.Location = new System.Drawing.Point(1292, 156);
             this.picLiveImage.Name = "picLiveImage";
-            this.picLiveImage.Size = new System.Drawing.Size(440, 506);
+            this.picLiveImage.Size = new System.Drawing.Size(440, 472);
             this.picLiveImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picLiveImage.TabIndex = 15;
+            this.picLiveImage.TabIndex = 16;
             this.picLiveImage.TabStop = false;
             //
             // lblLog
@@ -509,6 +545,7 @@ namespace _3DVision
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblLog);
             this.Controls.Add(this.picLiveImage);
+            this.Controls.Add(this.btnTriggerGrab);
             this.Controls.Add(this.btnRepeat);
             this.Controls.Add(this.txtRepeatEndPos);
             this.Controls.Add(this.lblRepeatEnd);
@@ -555,6 +592,8 @@ namespace _3DVision
         private System.Windows.Forms.Button btnJogMinus;
         private System.Windows.Forms.Button btnJogPlus;
         private System.Windows.Forms.Label lblAcsStatus;
+        private System.Windows.Forms.Button btnSetupPeg;
+        private System.Windows.Forms.Button btnHomeAxis;
         private System.Windows.Forms.Label lblLog;
         private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.GroupBox grpSmartRay;
@@ -585,6 +624,7 @@ namespace _3DVision
         private System.Windows.Forms.Label lblRepeatEnd;
         private System.Windows.Forms.TextBox txtRepeatEndPos;
         private System.Windows.Forms.Button btnRepeat;
+        private System.Windows.Forms.Button btnTriggerGrab;
         private System.Windows.Forms.PictureBox picLiveImage;
     }
 }
